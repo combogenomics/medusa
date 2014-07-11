@@ -6,7 +6,7 @@ reference genomes in a graph-based approach
 """
 
 #############
-# Imports    #
+# Imports   #
 #############
 
 from medusa_lib import *
@@ -14,14 +14,14 @@ from graph_lib import *
 import logging,sys,os
 from optparse import OptionParser,OptionGroup
 
-#############
-# Logger    #
-#############
+##########
+# Logger #
+##########
 
 logger = logging.getLogger('medusa')
 
 #################
-# Opt parsing    #
+# Opt parsing   #
 #################
 
 usage=""" %prog [options]
@@ -55,9 +55,9 @@ if not options.target or not options.comparison_dir:
     parser.error('Mandatory Arguments missing')
 
 
-#########
-# Main    #
-#########
+########
+# Main #
+########
 
 target_,comparison_dir_=options.target,options.comparison_dir
 
@@ -82,7 +82,7 @@ genome_ctable.close()
 
 os.chdir('tmp/')
 comparisons=[f for f in os.listdir('./') if f.startswith('reference')]
-for c in comparisons: runMummer(target,file2)
+for c in comparisons: runMummer(target,c)
 
 ## from MUMmer to network
 
@@ -98,9 +98,9 @@ coords2graph(coords,Scaffolding_graph)
 
 # TODO
 
-#############
-# TODOS        #
-#############
+############
+#  TODOS   #
+############
 
 # (really) add logger 
 # net2scaffold
