@@ -81,7 +81,7 @@ genome_ctable.close()
 ## do MUMmer for each pair
 
 os.chdir('tmp/')
-comparisons=[f for f in os.listdir('./') if f.startswith('reference')]
+comparisons=[f for f in os.listdir('./') if f.startswith('comparison')]
 for c in comparisons: runMummer(target,c)
 
 ## from MUMmer to network
