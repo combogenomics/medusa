@@ -72,19 +72,19 @@ def runMummer(file1,file2):
     return True,'no errors'
 
 class Mummer_hit(object):
-	#
-	def __init__(self,line):
-		self.qstart,self.qend,self.rstart,self.rend,self.len1,self.len2,self.percidy,\
-		self.lenr,self.lenq,self.covq,self.covr,self.query,self.reference=[i for l in line.split(' | ') for i in l.split()]
-		self.name=self.query
-		if int(self.rstart)>int(self.rend): self.orientation=-1
-		else: self.orientation=1
-	#
-	def distance_from(self,hit):
-		a1,a2,b1,b2=int(self.rstart),int(self.rend),int(hit.rstart),int(hit.rend)
-		if do_overlap([a1,a2],[b1,b2]): return 0
-		distance=abs(min(a1-b1,a1-b2,a2-b1,a2-b2))
-	return distance
+    #
+    def __init__(self,line):
+        self.qstart,self.qend,self.rstart,self.rend,self.len1,self.len2,self.percidy,\
+        self.lenr,self.lenq,self.covq,self.covr,self.query,self.reference=[i for l in line.split(' | ') for i in l.split()]
+        self.name=self.query
+        if int(self.rstart)>int(self.rend): self.orientation=-1
+        else: self.orientation=1
+    #
+    def distance_from(self,hit):
+        a1,a2,b1,b2=int(self.rstart),int(self.rend),int(hit.rstart),int(hit.rend)
+        if do_overlap([a1,a2],[b1,b2]): return 0
+        distance=abs(min(a1-b1,a1-b2,a2-b1,a2-b2))
+    return distance
 
 
 

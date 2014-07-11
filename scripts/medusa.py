@@ -6,22 +6,22 @@ reference genomes in a graph-based approach
 """
 
 #############
-# Imports	#
+# Imports    #
 #############
 
 from medusa_lib import *
-from graph_lib import *	
+from graph_lib import *    
 import logging,sys,os
 from optparse import OptionParser,OptionGroup
 
 #############
-# Logger	#
+# Logger    #
 #############
 
 logger = logging.getLogger('medusa')
 
 #################
-# Opt parsing	#
+# Opt parsing    #
 #################
 
 usage=""" %prog [options]
@@ -51,12 +51,12 @@ parser.add_option_group(group2)
 
 
 if not options.target or not options.comparison_dir:
-	parser.print_help()
-	parser.error('Mandatory Arguments missing')
+    parser.print_help()
+    parser.error('Mandatory Arguments missing')
 
 
 #########
-# Main	#
+# Main    #
 #########
 
 target_,comparison_dir_=options.target,options.comparison_dir
@@ -66,16 +66,16 @@ target_,comparison_dir_=options.target,options.comparison_dir
 # go target
 target=target_+'_renamed.fasta'
 storeTmpFasta('tmp/',target_,
-					new_name=target,tag='target_contig',threshold=1000,conv_table=target_+'.ctable')
+                    new_name=target,tag='target_contig',threshold=1000,conv_table=target_+'.ctable')
 
 # go comparison genomes
 n,genome_ctable=0,open('tmp/genomes_ctable')
 for g in os.listdir(comparison_dir_):
-	file_=comparison_dir_ + g
-	n+=1
-	storeTmpFasta('tmp/',file_,
-					new_name='comparison_%s.fasta' %n,tag='comparison_%s_contig' %n,threshold=1000,conv_table=file_+'.ctable')
-	genome_ctable.write('%s\t%s\n' %(g,'comparison_%s.fasta' %n))
+    file_=comparison_dir_ + g
+    n+=1
+    storeTmpFasta('tmp/',file_,
+                    new_name='comparison_%s.fasta' %n,tag='comparison_%s_contig' %n,threshold=1000,conv_table=file_+'.ctable')
+    genome_ctable.write('%s\t%s\n' %(g,'comparison_%s.fasta' %n))
 genome_ctable.close()
 
 ## do MUMmer for each pair
@@ -99,7 +99,7 @@ coords2graph(coords,Scaffolding_graph)
 # TODO
 
 #############
-# TODOS		#
+# TODOS        #
 #############
 
 # (really) add logger 
