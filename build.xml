@@ -19,7 +19,7 @@
         <delete dir="bin"/>
     </target>
     <target depends="clean" name="cleanall"/>
-    <target depends="build-project,makeJar" name="build"/>
+    <target depends="build-project,makeJar,archive" name="build"/>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac srcdir="src" destdir="bin" source="${source}" target="${target}" includeantruntime="false">
@@ -38,5 +38,18 @@
             <zipfileset excludes="META-INF/*.SF" src="lib/commons-cli-1.2.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/gson-2.2.4.jar"/>
         </jar>
+     </target>
+     <target depends="makeJar" name="archive">
+	<tar destfile="medusa.tar.gz" compression="gzip"
+		includes="medusa.jar LICENSE README.md">
+	    <tarfileset filemode="755" dir="medusa_scripts" prefix="medusa_scripts">
+                <include name="*" />
+        </tarfileset>
+	    <tarfileset dir="" prefix="">
+                <include name="medusa.jar LICENSE README.md" />
+        </tarfileset>
+
+	</tar>
     </target>
+
 </project>
