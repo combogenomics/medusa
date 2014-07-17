@@ -39,17 +39,16 @@
             <zipfileset excludes="META-INF/*.SF" src="lib/gson-2.2.4.jar"/>
         </jar>
      </target>
-     <target depends="makeJar" name="archive">
-	<tar destfile="medusa.tar.gz" compression="gzip"
-		includes="medusa.jar LICENSE README.md">
-	    <tarfileset filemode="755" dir="medusa_scripts" prefix="medusa_scripts">
+    <target depends="makeJar" name="archive">
+        <tar destfile="medusa.tar.gz" compression="gzip">
+	    <tarfileset dir="${basedir}" prefix="medusa">
+                <include name="medusa.jar" />
+                <include name="LICENSE" />
+                <include name="README.md" />
+            </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/medusa_scripts" prefix="medusa/medusa_scripts">
                 <include name="*" />
-        </tarfileset>
-	    <tarfileset dir="" prefix="">
-                <include name="medusa.jar LICENSE README.md" />
-        </tarfileset>
-
+            </tarfileset>
 	</tar>
     </target>
-
 </project>
