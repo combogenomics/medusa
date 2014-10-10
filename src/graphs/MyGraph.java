@@ -683,7 +683,7 @@ public class MyGraph {
 		return leaves;
 	}
 
-	public ArrayList<String> readScaffolds(String input) throws IOException {
+/*	public ArrayList<String> readScaffolds(String input) throws IOException {
 		HashMap<String, String> sequences = parseSequences(input);
 		ArrayList<String> scaffolds = new ArrayList<String>();
 		MyGraph copy = new MyGraph(this);
@@ -714,7 +714,7 @@ public class MyGraph {
 		}
 
 		return scaffolds;
-	}
+	}*/
 
 	private HashMap<String, String> parseSequences(String input)
 			throws IOException {
@@ -739,7 +739,7 @@ public class MyGraph {
 		return sequences;
 	}
 
-	private String scaffoldSeq(MyNode root,
+/*	private String scaffoldSeq(MyNode root,
 			HashMap<MyNode, Integer> originalDegrees,
 			HashMap<String, String> sequences) {
 		StringBuilder sb = new StringBuilder();
@@ -778,7 +778,7 @@ public class MyGraph {
 		sb.append(currentSeq);
 		String p = sb.toString();
 		return p;
-	}
+	}*/
 
 	public static String reverseComplement(String currentSeq) {
 		String s = currentSeq.replace("A", "a");
@@ -901,7 +901,8 @@ public class MyGraph {
 		for (MyNode n : copy.nodes) {
 			MyNode node = this.nodeFromId(n.getId());
 			if(n.getOrientation()!=100){
-			node.setOrientation(n.getOrientation());	
+			//System.out.println(node.getId()+"="+n.getOrientation());
+			node.setOrientation(n.getOrientation());
 			}else{
 				node.setOrientation(1);	
 			}
@@ -1021,6 +1022,8 @@ public class MyGraph {
 				System.out.println("Leaves:"+copy.getLeaves().toString());
 			}
 			String p = copy.scaffoldStringSeq(root, originalDegrees, sequences);
+			//String p = copy.scaffoldSeq(root, originalDegrees, sequences);
+			
 			scaffolds.add(p);
 		}
 
@@ -1093,16 +1096,25 @@ public class MyGraph {
 	
 	private String scaffoldStringSeq(MyNode root, HashMap<MyNode, Integer> originalDegrees, HashMap<String, String> sequences) {
 		StringBuilder sb = new StringBuilder();
-
-		String rootSeq= sequences.get(root.getId());
+		String rootSeq;
+		if(root.getOrientation()==-1){
+			rootSeq = reverseComplement(sequences.get(root.getId()));
+		} else{
+			rootSeq= sequences.get(root.getId());	
+		}
 		sb.append(rootSeq);
 		MyNode current = root.getAdj().get(0);
 		MyEdge start = this.getEdgeByST(root, current);
 		sb.append("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
 		this.removeEdge(start);
 		this.removeNode(root);
-		while (originalDegrees.get(current) == 2) {
-			String currentSeq = sequences.get(current.getId());
+		String currentSeq;
+		while (originalDegrees.get(current) == 2) {			
+			if(current.getOrientation()==-1){
+				 currentSeq = reverseComplement(sequences.get(current.getId()));	
+			} else{
+			 currentSeq = sequences.get(current.getId());	
+			}
 			sb.append(currentSeq);
 			MyNode next = current.getAdj().get(0);
 			MyEdge e = this.getEdgeByST(current, next);
@@ -1111,7 +1123,11 @@ public class MyGraph {
 			this.removeNode(current);
 			current = next;
 		}
-		String currentSeq = sequences.get(current.getId());
+		if(current.getOrientation()==-1){
+			 currentSeq = reverseComplement(sequences.get(current.getId()));	
+		} else{
+		 currentSeq = sequences.get(current.getId());	
+		}
 		sb.append(currentSeq);
 		String p = sb.toString();
 		return p;

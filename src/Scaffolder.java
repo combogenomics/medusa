@@ -24,6 +24,7 @@ import org.biojava3.core.sequence.ProteinSequence;
 import org.biojava3.core.sequence.io.FastaReaderHelper;
 
 import utilities.GexfReader;
+import utilities.GexfWriter;
 
 public class Scaffolder {
 
@@ -75,6 +76,13 @@ public class Scaffolder {
 						"OPTIONAL PARAMETER;The stout of MUMmer is printed on console.")
 				.create("v");
 		opts.addOption(verbose);
+		
+		Option gexf = OptionBuilder
+				.withValueSeparator()
+				.withDescription(
+						"Conting network and path cover are given in gexf format.")
+				.create("gexf");
+		opts.addOption(gexf);
 		
 		Option random = OptionBuilder.withArgName("<numberOfRounds>")
 				.hasArgs(1).withValueSeparator()
@@ -231,7 +239,6 @@ public class Scaffolder {
 			}
 		})) {
 			File f = new File(address);
-			// System.out.println(f.toString());
 			f.delete();
 		}
 		for (String address : dir.list(new FilenameFilter() {
@@ -240,7 +247,6 @@ public class Scaffolder {
 			}
 		})) {
 			File f = new File(address);
-			// System.out.println(f.toString());
 			f.delete();
 		}
 		
@@ -259,8 +265,8 @@ public class Scaffolder {
 		}
 		MyGraph grafoProvvisorio = new MyGraph(grafo);
 		MyGraph cover = greedyCover(grafoProvvisorio, factor);
+
 		
-		//GexfWriter.write(cover, input + "_COVER_Phase2.gexf");
 		cover.cleanOrinetation();
 		if (rounds > 1) {
 			System.out.println("Candidate cover size: "+ cover.getEdges().size());
@@ -327,8 +333,13 @@ public class Scaffolder {
 		writerOutput.println("Total length of the jointed fragments: " + totalLength);
 		writerOutput.println("N50: " + n50);
 		writerOutput.flush();
+		System.out.println("File saved: " + outputFile);
 		System.out.println("------------------------------------------------------------------------------------------------------------------------");
-
+		
+		 if(cl.hasOption("gexf")){
+			GexfWriter.write(grafo, input+"_network.gexf");
+			GexfWriter.write(cover, input+"_cover.gexf");
+		}
 	}
 	private MyGraph greedyCoverRandom(MyGraph network, double factor) {
 		ArrayList<MyEdge> candidateEdges = new ArrayList<MyEdge>(network.getEdges());
