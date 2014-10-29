@@ -1,0 +1,36 @@
+echo Burkholderia
+#bash pipe_testing_benchmark.sh Burkholderia_J2315_target.Scaffold.fasta Burkholderia_target burkho.mapping
+#bash pipe_testing_benchmark.sh medusa_scripts/burkho_results/burkho.scaffold Burkholderia_target burkho.mapping
+bash pipe_testing_benchmark.sh burkho.variation.scaffolds Burkholderia_target burkho.mapping
+mv pipe_testing_report burkho_testing_report
+mv string_scaffold_wrong_edges burkho_wrong_edges
+mv string_scaffold_disoriented_edges burkho_disoriented_edges
+mv string_scaffold_right_edges burkho_right_edges
+
+echo Mtub
+#bash pipe_testing_benchmark.sh Mtub_target.Scaffold.fasta Mtub_target mtub.mapping
+#bash pipe_testing_benchmark.sh medusa_scripts/mtub_results/mtub.scaffold Mtub_target mtub.mapping
+bash pipe_testing_benchmark.sh mtub.variation.scaffolds Mtub_target burkho.mapping
+mv pipe_testing_report mtub_testing_report
+mv string_scaffold_wrong_edges mtub_wrong_edges
+mv string_scaffold_disoriented_edges mtub_disoriented_edges
+mv string_scaffold_right_edges mtub_right_edges
+
+echo Rhodobacter
+#bash pipe_testing_benchmark.sh Rhodobacter_target.Scaffold.fasta Rhodobacter_target rhodo.mapping
+#bash pipe_testing_benchmark.sh medusa_scripts/rhodo_results/rhodo.scaffold Rhodobacter_target rhodo.mapping
+bash pipe_testing_benchmark.sh rhodo.variation.scaffolds Rhodobacter_target rhodo.mapping
+mv pipe_testing_report rhodo_testing_report
+mv string_scaffold_wrong_edges rhodo_wrong_edges
+mv string_scaffold_disoriented_edges rhodo_disoriented_edges
+mv string_scaffold_right_edges rhodo_right_edges
+
+echo Ecoli
+#bash pipe_testing_benchmark.sh E.Coli_target.Scaffold.fasta E.Coli_target ecoli.mapping
+#bash pipe_testing_benchmark.sh medusa_scripts/coli_results/coli.scaffold E.Coli_target ecoli.mapping
+bash pipe_testing_benchmark.sh coli.variation.scaffolds E.Coli_target ecoli.mapping
+mv pipe_testing_report coli_testing_report
+mv string_scaffold_wrong_edges coli_wrong_edges
+mv string_scaffold_disoriented_edges coli_disoriented_edges
+mv string_scaffold_right_edges coli_right_edges
+
