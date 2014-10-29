@@ -2,15 +2,37 @@ from mummer_parser import *
 import sys,os
 #from IPython import embed
 import networkx as nx
+from cPickle import dump
+from optparse import OptionParser,OptionGroup
 
 ######################################
 
 if __name__=='__main__':
-	usage='python netcon_mummer.py mapping_dir query_genome gexf_out'
-	args=sys.argv
-	mapping_dir=args[1]
-	query_genome=args[2]
-	out=args[3]
+	usage=""" %prog [options]
+	"""
+	############ 'python netcon_mummer.py mapping_dir query_genome gexf_out [wscheme] [testing]'
+	parser = OptionParser(usage=usage)
+	# mandatory
+	group1 = OptionGroup(parser, "Mandatory Arguments")
+	group1.add_option("-i", "--input", dest="query_genome",
+	help="target genome to be scaffolded", metavar="FILE")
+	group1.add_option("-f", "--files", dest="mapping_dir",
+	help="DIR where the comparison genomes are stored", metavar="DIR")
+	parser.add_option_group(group1)
+	group1.add_option("-o", "--output", dest="out",
+	help="write graph to FILE", metavar="FILE")
+	# optional
+	group2 = OptionGroup(parser, "Optional Arguments")
+	group2.add_option("-w", "--weightingscheme", dest="scheme", action="store_true",default=False,
+	help="use a weighting scheme based on sequence similarity")
+	group2.add_option("-t", "--testing", dest="testing", action="store_true",default=False,
+	help="outputs a pkl object for testing [OLD]")
+	parser.add_option_group(group2)
+	(options, args) = parser.parse_args()
+	if not options.query_genome or not options.mapping_dir or not options.out:
+		parser.print_help()
+		parser.error('Mandatory Arguments missing')
+	query_genome,mapping_dir,out,scheme,testing=options.query_genome,options.mapping_dir,options.out,options.scheme,options.testing
 	if not mapping_dir.endswith('/'): mapping_dir+='/'
 	
 ######################################
@@ -25,12 +47,66 @@ def sort_(clusters):
 	return edges
 
 def update_edges(G,Edge):
-	u,v,distance,orientation=Edge.name1,Edge.name2,Edge.distance,Edge.orientation
-	w=G.get_edge_data(u,v,{'weight':0})['weight'] + 1
+	u,v,distance,orientation,weight=Edge.name1,Edge.name2,Edge.distance,Edge.orientation,Edge.weight
+	w=G.get_edge_data(u,v,{'weight':0})['weight'] + weight
 	d=G.get_edge_data(u,v,{'distance':0})['distance'] + distance
 	o=G.get_edge_data(u,v,{'orientation':[]})['orientation']
 	o.append(orientation)
 	G.add_edge(u,v,weight=w,distance=d,orientation=o)
+	
+def update_edges_(G,Edge):
+	""" testing function, """
+	u,v,distance,orientation,weight=Edge.name1,Edge.name2,Edge.distance,Edge.orientation,Edge.weight
+	w=G.get_edge_data(u,v,{'weight':0})['weight'] + weight
+	d=G.get_edge_data(u,v,{'distance':[]})['distance'] + [distance]
+	o=G.get_edge_data(u,v,{'orientation':[]})['orientation']
+	o.append(orientation)
+	G.add_edge(u,v,weight=w,distance=d,orientation=o)
+	
+def compute_distances(G):
+	""" Estimate the distance for each edge """
+	import numpy as np
+	for u,v in G.edges():
+		distances=np.array(G[u][v]['distance'])
+		dist=distanceEstimation(distances)
+		G[u][v]['distance']=dist
+	
+def distanceEstimation(dist_list,method=1):
+	""" Estimate the distance between two contigs, by computing the
+		average of all distances found for these in the reference 
+		genomes. A method for outlier detection is used in order to
+		obtain reliable mean."""
+	import numpy as np
+	v=np.array(dist_list)
+	if method == 1: mask=madBasedOutlier(v)
+	else: mask=percentileBasedOutlier(v)
+	distance=v[-mask].mean()
+	return distance
+
+def madBasedOutlier(points, thresh=3.5):
+	""" return outliers based on median-absolute-deviation (MAD) 
+		This performs better on small data samples (<20).
+		Require numpy object."""
+	import numpy as np
+	from IPython import embed
+	if len(points.shape) == 1: points = points[:,None]
+	median = np.median(points, axis=0)
+	diff = np.sum((points - median)**2, axis=-1)
+	diff = np.sqrt(diff)
+	med_abs_deviation = np.median(diff)
+	modified_z_score = 0.6745 * diff / med_abs_deviation
+	#if med_abs_deviation == 0: embed()
+	return modified_z_score > thresh
+	
+def percentileBasedOutlier(data, threshold=95):
+	""" return outliers based on percentiles 
+		This performs better on big data samples (>20).
+		Require numpy object"""
+	import numpy as np
+	diff = (100 - threshold) / 2.0
+	minval, maxval = np.percentile(data, [diff, 100 - diff])
+	return (data < minval) | (data > maxval)
+
 
 def initialize_graph(genome):
 	import networkx as nx
@@ -81,10 +157,13 @@ def convert_orientations(e,ori_list):
 ######################################
 
 class Edge(object):
-	def __init__(self,hit1,hit2):
+	def __init__(self,hit1,hit2,wscheme=1):
 		self.name1,self.name2=hit1.query,hit2.query
 		self.distance=hit1.distance_from(hit2)
+		doMapWithin(hit1,hit2)
 		self.orientation=format_orientation_string(hit1,hit2)
+		if wscheme==1:self.weight=1
+		else: self.weight=hit1.weight2+hit2.weight2
 
 ######################################
 if __name__ == '__main__':
@@ -95,9 +174,12 @@ if __name__ == '__main__':
 		print('using input',coord)
 		clusters=parse_mummer(mapping_dir + coord)
 		edges=sort_(clusters)
-		for e in edges: update_edges(G,Edge(*e))
+		for e in edges:
+			if not testing: update_edges(G,Edge(*e))
+			else: update_edges_(G,Edge(*e))
 	#embed()
-	G3=G.copy()
 	print('adjusting orientations')
 	adjust_orientations(G)
-	nx.write_gexf(G,out)
+	if testing: compute_distances(G)
+	if not testing: nx.write_gexf(G,out)
+	else: dump(G,open(out,'w'))
