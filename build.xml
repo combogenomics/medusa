@@ -52,6 +52,36 @@
 	    <tarfileset filemode="755" dir="${basedir}/medusa_testing" prefix="medusa/medusa_testing">
                 <include name="*" />
             </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/datasets/BCEN" prefix="medusa/datasets/BCEN">
+                <include name="*" />
+            </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/datasets/ECOL" prefix="medusa/datasets/ECOL">
+                <include name="*" />
+            </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/datasets/MTUB" prefix="medusa/datasets/MTUB">
+                <include name="*" />
+            </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/datasets/RSPH" prefix="medusa/datasets/RSPH">
+                <include name="*" />
+            </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/datasets/SAUR" prefix="medusa/datasets/SAUR">
+                <include name="*" />
+            </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/datasets/BCEN/reference_genomes" prefix="medusa/datasets/BCEN/reference_genomes">
+                <include name="*" />
+            </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/datasets/ECOL/reference_genomes" prefix="medusa/datasets/ECOL/reference_genomes">
+                <include name="*" />
+            </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/datasets/MTUB/reference_genomes" prefix="medusa/datasets/MTUB/reference_genomes">
+                <include name="*" />
+            </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/datasets/RSPH/reference_genomes" prefix="medusa/datasets/RSPH/reference_genomes">
+                <include name="*" />
+            </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/datasets/SAUR/reference_genomes" prefix="medusa/datasets/SAUR/reference_genomes">
+                <include name="*" />
+            </tarfileset>
 	</tar>
     </target>
 </project>
