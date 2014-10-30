@@ -91,7 +91,14 @@ You can now run the java application with the following parameters:
     solution. Since the variability is small In practice 5 rounds are
     usually sufficient to find the best score.
 
-6.  Finally the *-h* option provides a small recap of the previous ones.
+6.  The option *-w2* is optional and allows for a sequence similarity
+    based weighting scheme. Using a different weighting scheme may lead
+    to better results.
+
+7.  The option *-d* outputs a file indicating the estimated distances
+    between pair of contigs (<contig A> <contig B> <estimated distance>).
+
+8.  Finally the *-h* option provides a small recap of the previous ones.
 
 An Example
 ----------
