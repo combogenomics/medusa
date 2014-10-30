@@ -157,12 +157,12 @@ def convert_orientations(e,ori_list):
 ######################################
 
 class Edge(object):
-	def __init__(self,hit1,hit2,wscheme=1):
+	def __init__(self,hit1,hit2,wscheme=0):
 		self.name1,self.name2=hit1.query,hit2.query
 		self.distance=hit1.distance_from(hit2)
 		doMapWithin(hit1,hit2)
 		self.orientation=format_orientation_string(hit1,hit2)
-		if wscheme==1:self.weight=1
+		if wscheme==0:self.weight=1
 		else: self.weight=hit1.weight2+hit2.weight2
 
 ######################################
@@ -175,8 +175,8 @@ if __name__ == '__main__':
 		clusters=parse_mummer(mapping_dir + coord)
 		edges=sort_(clusters)
 		for e in edges:
-			if not testing: update_edges(G,Edge(*e))
-			else: update_edges_(G,Edge(*e))
+			if not testing: update_edges(G,Edge(*e,wscheme=scheme))
+			else: update_edges_(G,Edge(*e,wscheme=scheme))
 	#embed()
 	print('adjusting orientations')
 	adjust_orientations(G)
