@@ -49,6 +49,9 @@
 	    <tarfileset filemode="755" dir="${basedir}/medusa_scripts" prefix="medusa/medusa_scripts">
                 <include name="*" />
             </tarfileset>
+	    <tarfileset filemode="755" dir="${basedir}/medusa_testing" prefix="medusa/medusa_testing">
+                <include name="*" />
+            </tarfileset>
 	</tar>
     </target>
 </project>
