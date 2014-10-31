@@ -76,13 +76,26 @@ public class Scaffolder {
 						"OPTIONAL PARAMETER;The stout of MUMmer is printed on console.")
 				.create("v");
 		opts.addOption(verbose);
+		Option weightScheme2 = OptionBuilder
+				.withValueSeparator()
+				.withDescription(
+						"OPTIONAL PARAMETER;The weight of a join is evaluated taking in account similarity and coverage of the sequences.")
+				.create("w2");
+		opts.addOption(weightScheme2);
 		
 		Option gexf = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
-						"Conting network and path cover are given in gexf format.")
+						"OPTIONAL PARAMETER;Conting network and path cover are given in gexf format.")
 				.create("gexf");
 		opts.addOption(gexf);
+		
+		Option distances = OptionBuilder
+				.withValueSeparator()
+				.withDescription(
+						"OPTIONAL PARAMETER;For each joint an estimation of the lenght of the gap is provided. This information is contained in the file *_distanceTable")
+				.create("d");
+		opts.addOption(distances);
 		
 		Option random = OptionBuilder.withArgName("<numberOfRounds>")
 				.hasArgs(1).withValueSeparator()
@@ -109,7 +122,7 @@ public class Scaffolder {
 
 
 	
-	public static Double computeN50(MyGraph cover) {
+	/*public static Double computeN50(MyGraph cover) {
 		int sum = 0;
 		ArrayList<Integer> a = new ArrayList<Integer>();
 		 ArrayList<String> multicontigscaffold = cover.subPaths();
@@ -166,7 +179,7 @@ public class Scaffolder {
 		} else {
 			return (m.get(middle - 1) + m.get(middle) / 2.0);
 		}
-	}
+	}*/
 
 	private int computeLenght(ArrayList<String> paths) {
 		int l = 0;
@@ -219,14 +232,27 @@ public class Scaffolder {
 		  System.out.print("done.\n");
 		  
 		  System.out.println("------------------------------------------------------------------------------------------------------------------------");
-		  System.out.print("Building the network..."); process = new
-		  ProcessBuilder("python", "medusa_scripts/netcon_mummer.py", ".",
-		  input, "network") .start(); 
-		  errors = new BufferedReader(new
-		  InputStreamReader( process.getErrorStream())); while ((line =
-		  errors.readLine()) != null) { System.out.println(line); } if
-		  (process.waitFor() != 0) { throw new
-		  RuntimeException("Error: Network construction failed."); }
+		  System.out.print("Building the network...");
+		  String current = new java.io.File( "." ).getCanonicalPath();
+		  if(cl.hasOption("w2")){//new weight scheme
+			  
+			  process = new ProcessBuilder("python", "medusa_scripts/netcon_mummer.py", "-f"+current,
+					  "-i"+input, "-onetwork", "-w") .start(); 
+					  errors = new BufferedReader(new
+					  InputStreamReader( process.getErrorStream())); while ((line =
+					  errors.readLine()) != null) { System.out.println(line); } if
+					  (process.waitFor() != 0) { throw new
+					  RuntimeException("Error: Network construction failed."); }
+		  }else{//old weight scheme
+			  process = new ProcessBuilder("python", "medusa_scripts/netcon_mummer.py", "-f"+current,
+					  "-i"+input, "-onetwork") .start(); 
+					  errors = new BufferedReader(new
+					  InputStreamReader( process.getErrorStream())); while ((line =
+					  errors.readLine()) != null) { System.out.println(line); } if
+					  (process.waitFor() != 0) { throw new
+					  RuntimeException("Error: Network construction failed."); }
+		  }
+		 
 		
 		MyGraph grafo = GexfReader.read("network");
 		 //cancella i file coords and delta e il file network
@@ -309,7 +335,7 @@ public class Scaffolder {
 		}
 		
 		writerOutput2.flush();
-		System.out.println("File saved: " + outputFile2);
+		System.out.println("Scaffolds File saved: " + outputFile2);
 		
 		System.out.println("------------------------------------------------------------------------------------------------------------------------");
 		
@@ -318,27 +344,40 @@ public class Scaffolder {
 		writerOutput.write("Target genome: " + input + "\n");
 		
 		writerOutput.println("\n--------------SCAFFOLDS---------------\n");
+		
+		
+		
 		int finalSingletons=(cover.getNodes().size()-cover.notSingletons());
 		ArrayList<String> paths = cover.subPaths();
 		int totalLength = computeLenght(paths);
-		Double n50 = computeN50(cover);
 
 		int numberOfScaffolds = paths.size() + finalSingletons;
 		
 		System.out.println("Number of scaffolds: " + numberOfScaffolds + " (singletons = " + finalSingletons + ", multi-contig scaffold = " + paths.size()+") \nfrom " +cover.getNodes().size() +" initial fragments.");
 		System.out.println("Total length of the jointed fragments: " + totalLength);
-		System.out.println("N50: " + n50);
+		//N50 script:
+		System.out.print("N50: "); process = new ProcessBuilder("python", "medusa_scripts/N50.py", scaffoldsfilename) .start(); 
+		  errors = new BufferedReader(new InputStreamReader( process.getInputStream())); while ((line =
+		  errors.readLine()) != null) { System.out.println(line); } if
+		  (process.waitFor() != 0) { throw new
+		  RuntimeException("Error: Network construction failed."); }
 		
 		writerOutput.println("Number of scaffolds: " + numberOfScaffolds + " (singletons = " + finalSingletons + ", multi-contig scaffold = " + paths.size()+") \nfrom " +cover.getNodes().size() +" initial fragments.");
 		writerOutput.println("Total length of the jointed fragments: " + totalLength);
-		writerOutput.println("N50: " + n50);
 		writerOutput.flush();
-		System.out.println("File saved: " + outputFile);
-		System.out.println("------------------------------------------------------------------------------------------------------------------------");
+		System.out.println("Summary File saved: " + outputFile);
 		
-		 if(cl.hasOption("gexf")){
+		
+		//-------------OPTIONAL OUTPUTS------------------//
+		
+		if(cl.hasOption("gexf")){
+				System.out.println("------------------------------------------------------------------------------------------------------------------------");
 			GexfWriter.write(grafo, input+"_network.gexf");
 			GexfWriter.write(cover, input+"_cover.gexf");
+		}
+		 if(cl.hasOption("d")){
+				System.out.println("------------------------------------------------------------------------------------------------------------------------");
+			MyGraph.writeDistanceFile(cover, input+"_distanceTable");
 		}
 	}
 	private MyGraph greedyCoverRandom(MyGraph network, double factor) {

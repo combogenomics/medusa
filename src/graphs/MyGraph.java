@@ -3,6 +3,7 @@ package graphs;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.NetworkInterface;
@@ -1131,6 +1132,15 @@ public class MyGraph {
 		sb.append(currentSeq);
 		String p = sb.toString();
 		return p;
+	}
+
+	public static void writeDistanceFile(MyGraph grafo, String fileName) throws IOException {
+		File outputFile = new File(fileName);
+		PrintWriter writerOutput = new PrintWriter(new FileWriter(outputFile));
+		for(MyEdge e : grafo.getEdges()){
+			writerOutput.write(e.getSource().getId()+"\t"+e.getTarget().getId()+"\t"+e.getLenght()+"\n");
+		}
+		writerOutput.flush();
 	}
 
 
