@@ -114,29 +114,23 @@ You can now run the java application with the following parameters:
 
 9.  Finally the *-h* option provides a small recap of the previous ones.
 
-An Example
-----------
+The Medusa archive
+------------------
 
 When *medusa* archive is unzipped the files are the followings:
 
 -   the medusa.jar file.
 
--   the scripts sub-folder “medusa-scripts”.
+-   the scripts sub-folder “medusa_scripts”.
 
--   the comparison genomes sub-folder “drafts”. Empty
+-   the utility test scripts folder "medusa_testing"
 
--   a folder “datasets”.
+-   a folder “datasets”, containing five bacterial datasets.
 
-We provide you a dataset as an example. Move the target file in the main
-folder and all the comparison genomes in the “drafts” folder. Now you
-can run the program with the following command line:
-
-    java -jar medusa.jar -i targetgenome -v
-
-Running the example
+Running an example
 -------------------
 
-    java -jar medusa.jar -f datasets -i datasets/Burkholderia_target -v
+    java -jar medusa.jar -f datasets/ECOL/reference_genomes/ -i datasets/ECOL/E.Coli_target.fna -v
 
 Compile
 -------
