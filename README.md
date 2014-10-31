@@ -56,6 +56,17 @@ The following output files will be produced.
 -   targetGenome.Scaffold.fasta: a fasta file with the sequences grouped
     in scaffolds. Between two contigs in the same scaffolds 100 N are
     inserted to fill the gap.
+    
+The following output files can optionally be produced.
+
+-   targetGenome_distanceTable: a tabular file with the estimation of the
+	distance between successive contigs (bp).
+	
+
+-   targetGenome_network.gexf: the contig network in gexf format.
+
+-   targetGenome_cover.gexf: the final path cover in gexf format.
+
 
 Usage
 -----
@@ -97,8 +108,11 @@ You can now run the java application with the following parameters:
 
 7.  The option *-d* outputs a file indicating the estimated distances
     between pair of contigs (<contig A> <contig B> <estimated distance>).
+	
+8. The *-gexf* is optional. With this option the gexf format of the contig network and
+	the path cover are porvided.
 
-8.  Finally the *-h* option provides a small recap of the previous ones.
+9.  Finally the *-h* option provides a small recap of the previous ones.
 
 An Example
 ----------
