@@ -72,6 +72,15 @@ public class Scaffolder {
 				.create("f");
 		opts.addOption(f);
 		
+		Option scriptPath = OptionBuilder
+				.withArgName("<medusaScriptsFolder>")
+				.hasArgs(1)
+				.withValueSeparator()
+				.withDescription(
+						"OPTIONAL PARAMETER; The folder containing the medusa scripts. Default value: medusa_scripts")
+				.create("scriptPath");
+		opts.addOption(scriptPath);
+		
 		Option verbose = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
@@ -230,10 +239,14 @@ public class Scaffolder {
 		if (cl.getOptionValue("f") != null) {
 			draftsFolder = cl.getOptionValue("f");
 		}
+		String medusaScripts ="medusa_scripts";
+		if (cl.getOptionValue("scriptPath") != null) {
+			medusaScripts = cl.getOptionValue("scriptPath");
+		}
 		System.out.println("------------------------------------------------------------------------------------------------------------------------");
 		String line;
 		  System.out.print("Running MUMmer..."); Process process = new
-		  ProcessBuilder("medusa_scripts/mmrBatch.sh", draftsFolder, input).start();
+		  ProcessBuilder(medusaScripts+"/mmrBatch.sh", draftsFolder, input).start();
 		  BufferedReader errors = new BufferedReader(new InputStreamReader(
 				  process.getErrorStream()));
 		  if(cl.hasOption("v")){
@@ -254,7 +267,7 @@ public class Scaffolder {
 		  String current = new java.io.File( "." ).getCanonicalPath();
 		  if(cl.hasOption("w2")){//new weight scheme
 			  
-			  process = new ProcessBuilder("python", "medusa_scripts/netcon_mummer.py", "-f"+current,
+			  process = new ProcessBuilder("python", medusaScripts+"/netcon_mummer.py", "-f"+current,
 					  "-i"+input, "-onetwork", "-w") .start(); 
 					  errors = new BufferedReader(new
 					  InputStreamReader( process.getErrorStream())); while ((line =
@@ -262,7 +275,7 @@ public class Scaffolder {
 					  (process.waitFor() != 0) { throw new
 					  RuntimeException("Error: Network construction failed."); }
 		  }else{//old weight scheme
-			  process = new ProcessBuilder("python", "medusa_scripts/netcon_mummer.py", "-f"+current,
+			  process = new ProcessBuilder("python", medusaScripts+"/netcon_mummer.py", "-f"+current,
 					  "-i"+input, "-onetwork") .start(); 
 					  errors = new BufferedReader(new
 					  InputStreamReader( process.getErrorStream())); while ((line =
@@ -374,7 +387,7 @@ public class Scaffolder {
 		System.out.println("Number of scaffolds: " + numberOfScaffolds + " (singletons = " + finalSingletons + ", multi-contig scaffold = " + paths.size()+") \nfrom " +cover.getNodes().size() +" initial fragments.");
 		System.out.println("Total length of the jointed fragments: " + totalLength);
 		//N50 script:
-		System.out.print("N50: "); process = new ProcessBuilder("python", "medusa_scripts/N50.py", scaffoldsfilename) .start(); 
+		System.out.print("N50: "); process = new ProcessBuilder("python", medusaScripts+"/N50.py", scaffoldsfilename) .start(); 
 		  errors = new BufferedReader(new InputStreamReader( process.getInputStream())); while ((line =
 		  errors.readLine()) != null) { System.out.println(line); } if
 		  (process.waitFor() != 0) { throw new
