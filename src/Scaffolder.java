@@ -27,7 +27,9 @@ import utilities.GexfReader;
 import utilities.GexfWriter;
 
 public class Scaffolder {
-
+	public static final int VERSION_MAJOR = 1;
+	public static final int VERSION_MINOR = 0;
+	
 	public static void main(String[] args)
 			throws Exception {
 		new Scaffolder(args);
@@ -90,6 +92,14 @@ public class Scaffolder {
 				.create("gexf");
 		opts.addOption(gexf);
 		
+		Option help = OptionBuilder
+				.withValueSeparator()
+				.withDescription(
+						"Print this help and exist.")
+				.create("h");
+		opts.addOption(help);
+		
+		
 		Option distances = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
@@ -106,16 +116,24 @@ public class Scaffolder {
 
 		BasicParser bp = new BasicParser();
 		try {
-
+			
 			CommandLine cl = bp.parse(opts, args);
-
-			 if (cl.hasOption("i")) {
+			if(cl.hasOption("h") || !cl.hasOption("i")){
+				printHelp(opts);
+			}
+			else if (cl.hasOption("i")) {
 				scaffolderHS(cl);
 			}
 		} catch (UnrecognizedOptionException uoe) {
-			HelpFormatter f1 = new HelpFormatter();
-			f1.printHelp("avalaible options", opts);
+			printHelp(opts);
 		}
+	}
+	
+	private void printHelp(Options opts) {
+		System.out.println(String.format("Medusa version %d.%d", VERSION_MAJOR, VERSION_MINOR));
+		HelpFormatter f1 = new HelpFormatter();
+		f1.printHelp("java -jar medusa.jar -i inputfile -v", "available options: ", opts, "");
+	
 	}
 
 
