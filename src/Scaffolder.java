@@ -84,7 +84,7 @@ public class Scaffolder {
 		Option verbose = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
-						"OPTIONAL PARAMETER;The stout of MUMmer is printed on console.")
+						"OPTIONAL PARAMETER;The stdout of MUMmer is printed on console.")
 				.create("v");
 		opts.addOption(verbose);
 		Option weightScheme2 = OptionBuilder
