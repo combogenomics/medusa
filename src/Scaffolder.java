@@ -246,7 +246,7 @@ public class Scaffolder {
 		System.out.println("------------------------------------------------------------------------------------------------------------------------");
 		String line;
 		  System.out.print("Running MUMmer..."); Process process = new
-		  ProcessBuilder(medusaScripts+"/mmrBatch.sh", draftsFolder, input).start();
+		  ProcessBuilder(medusaScripts+"/mmrBatch.sh", draftsFolder, input, medusaScripts).start();
 		  BufferedReader errors = new BufferedReader(new InputStreamReader(
 				  process.getErrorStream()));
 		  if(cl.hasOption("v")){
