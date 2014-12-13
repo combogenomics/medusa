@@ -31,20 +31,17 @@ import utilities.N50;
 public class Scaffolder {
 	public static final int VERSION_MAJOR = 1;
 	public static final int VERSION_MINOR = 1;
-	
-	public static void main(String[] args)
-			throws Exception {
+
+	public static void main(String[] args) throws Exception {
 		new Scaffolder(args);
 	}
 
-	public Scaffolder(String[] args)
-			throws Exception {
+	public Scaffolder(String[] args) throws Exception {
 		runOnTerminal(args);
 	}
 
 	@SuppressWarnings("static-access")
-	private void runOnTerminal(String[] args)
-			throws Exception {
+	private void runOnTerminal(String[] args) throws Exception {
 		Options opts = new Options();
 
 		Option input = OptionBuilder
@@ -55,7 +52,7 @@ public class Scaffolder {
 						"REQUIRED PARAMETER; File name of the fasta file of the target genome.")
 				.create("i");
 		opts.addOption(input);
-		
+
 		Option output = OptionBuilder
 				.withArgName("<outputName>")
 				.hasArgs(1)
@@ -64,7 +61,7 @@ public class Scaffolder {
 						"OPTIONAL PARAMETER; Ouptut file name. Default value: input.Scaffold.fasta")
 				.create("o");
 		opts.addOption(output);
-		
+
 		Option f = OptionBuilder
 				.withArgName("<draftsFolder>")
 				.hasArgs(1)
@@ -73,7 +70,7 @@ public class Scaffolder {
 						"OPTIONAL PARAMETER; The folder containing the comparison genomes. Default value: drafts")
 				.create("f");
 		opts.addOption(f);
-		
+
 		Option scriptPath = OptionBuilder
 				.withArgName("<medusaScriptsFolder>")
 				.hasArgs(1)
@@ -82,7 +79,7 @@ public class Scaffolder {
 						"OPTIONAL PARAMETER; The folder containing the medusa scripts. Default value: medusa_scripts")
 				.create("scriptPath");
 		opts.addOption(scriptPath);
-		
+
 		Option verbose = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
@@ -95,69 +92,67 @@ public class Scaffolder {
 						"OPTIONAL PARAMETER;The weight of a join is evaluated taking in account similarity and coverage of the sequences.")
 				.create("w2");
 		opts.addOption(weightScheme2);
-		
+
 		Option gexf = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
 						"OPTIONAL PARAMETER;Conting network and path cover are given in gexf format.")
 				.create("gexf");
 		opts.addOption(gexf);
-		
-		Option help = OptionBuilder
-				.withValueSeparator()
-				.withDescription(
-						"Print this help and exist.")
-				.create("h");
+
+		Option help = OptionBuilder.withValueSeparator()
+				.withDescription("Print this help and exist.").create("h");
 		opts.addOption(help);
-		
-		
+
 		Option distances = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
 						"OPTIONAL PARAMETER;For each joint an estimation of the lenght of the gap is provided. This information is contained in the file *_distanceTable")
 				.create("d");
 		opts.addOption(distances);
-		
-		Option random = OptionBuilder.withArgName("<numberOfRounds>")
-				.hasArgs(1).withValueSeparator()
-				.withDescription("OPTIONAL PARAMETER; This (integer) value indicates how many randomly sampled solutions the tool evauate in order to minimize the number of scaffolds. Suggested value=5.")
+
+		Option random = OptionBuilder
+				.withArgName("<numberOfRounds>")
+				.hasArgs(1)
+				.withValueSeparator()
+				.withDescription(
+						"OPTIONAL PARAMETER; This (integer) value indicates how many randomly sampled solutions the tool evauate in order to minimize the number of scaffolds. Suggested value=5.")
 				.create("random");
 		opts.addOption(random);
 
-		Option n50 = OptionBuilder.withArgName("<fastaFile>")
-				.hasArgs(1).withValueSeparator()
+		Option n50 = OptionBuilder.withArgName("<fastaFile>").hasArgs(1)
+				.withValueSeparator()
 				.withDescription("OPTIONAL PARAMETER; N50 statistics.")
 				.create("n50");
 		opts.addOption(n50);
 
 		BasicParser bp = new BasicParser();
 		try {
-			
+
 			CommandLine cl = bp.parse(opts, args);
-			if(cl.hasOption("h") || (!cl.hasOption("i") && !cl.hasOption("n50"))){
+			if (cl.hasOption("h")
+					|| (!cl.hasOption("i") && !cl.hasOption("n50"))) {
 				printHelp(opts);
-			}
-			else if (cl.hasOption("i")) {
+			} else if (cl.hasOption("i")) {
 				scaffolderHS(cl);
 			}
-			
-			else if(cl.hasOption("n50")){
+
+			else if (cl.hasOption("n50")) {
 				n50avaluation(cl);
 			}
 		} catch (UnrecognizedOptionException uoe) {
 			printHelp(opts);
 		}
 	}
-	
-
 
 	private void printHelp(Options opts) {
-		System.out.println(String.format("Medusa version %d.%d", VERSION_MAJOR, VERSION_MINOR));
+		System.out.println(String.format("Medusa version %d.%d", VERSION_MAJOR,
+				VERSION_MINOR));
 		HelpFormatter f1 = new HelpFormatter();
-		f1.printHelp("java -jar medusa.jar -i inputfile -v", "available options: ", opts, "");
-	
-	}
+		f1.printHelp("java -jar medusa.jar -i inputfile -v",
+				"available options: ", opts, "");
 
+	}
 
 	private int computeLenght(ArrayList<String> paths) {
 		int l = 0;
@@ -171,9 +166,7 @@ public class Scaffolder {
 		return l;
 	}
 
-
-	private void scaffolderHS(CommandLine cl)
-			throws Exception {
+	private void scaffolderHS(CommandLine cl) throws Exception {
 
 		String input = cl.getOptionValues("i")[0];
 		System.out.println("INPUT FILE:" + input);
@@ -182,7 +175,7 @@ public class Scaffolder {
 			rounds = Integer.parseInt(cl.getOptionValue("random"));
 			System.out.println("Random rounds:" + rounds);
 		}
-		String scaffoldsfilename = input+"Scaffold.fasta";
+		String scaffoldsfilename = input + "Scaffold.fasta";
 		if (cl.getOptionValue("o") != null) {
 			scaffoldsfilename = cl.getOptionValue("o");
 		}
@@ -190,56 +183,91 @@ public class Scaffolder {
 		if (cl.getOptionValue("f") != null) {
 			draftsFolder = cl.getOptionValue("f");
 		}
-		String medusaScripts ="medusa_scripts";
+		String medusaScripts = "medusa_scripts";
 		if (cl.getOptionValue("scriptPath") != null) {
 			medusaScripts = cl.getOptionValue("scriptPath");
 		}
+	
+		
+		/*
+		 * ####################################################################### 
+		 * STEP1: Mapping the target contigs onto the comparison genomes using
+		 * the MUMmer software.
+		 * ####################################################################### 
+		 * 
+		 */
+
 		System.out.println("------------------------------------------------------------------------------------------------------------------------");
 		String line;
-		  System.out.print("Running MUMmer..."); Process process = new
-		  ProcessBuilder(medusaScripts+"/mmrBatch.sh", draftsFolder, input, medusaScripts).start();
-		  BufferedReader errors = new BufferedReader(new InputStreamReader(
-				  process.getErrorStream()));
-		  if(cl.hasOption("v")){
-					  while ((line = errors.readLine()) != null) {
-						  System.out.println(line); } if (process.waitFor() != 0) { throw new
-						  RuntimeException("Error running MUMmer."); }  
-		  } else{
-			  while ((line = errors.readLine()) != null) {
-				  }
-			  if (process.waitFor() != 0) { throw new
-				  RuntimeException("Error running MUMmer."); }
-		  }
-		  
-		  System.out.print("done.\n");
-		  
-		  System.out.println("------------------------------------------------------------------------------------------------------------------------");
-		  System.out.print("Building the network...");
-		  String current = new java.io.File( "." ).getCanonicalPath();
-		  if(cl.hasOption("w2")){//new weight scheme
-			  
-			  process = new ProcessBuilder("python", medusaScripts+"/netcon_mummer.py", "-f"+current,
-					  "-i"+input, "-onetwork", "-w") .start(); 
-					  errors = new BufferedReader(new
-					  InputStreamReader( process.getErrorStream())); while ((line =
-					  errors.readLine()) != null) { System.out.println(line); } if
-					  (process.waitFor() != 0) { throw new
-					  RuntimeException("Error: Network construction failed."); }
-		  }else{//old weight scheme
-			  process = new ProcessBuilder("python", medusaScripts+"/netcon_mummer.py", "-f"+current,
-					  "-i"+input, "-onetwork") .start(); 
-					  errors = new BufferedReader(new
-					  InputStreamReader( process.getErrorStream())); while ((line =
-					  errors.readLine()) != null) { System.out.println(line); } if
-					  (process.waitFor() != 0) { throw new
-					  RuntimeException("Error: Network construction failed."); }
-		  }
-		 
+		System.out.print("Running MUMmer...");
+		Process process = new ProcessBuilder(medusaScripts + "/mmrBatch.sh",
+				draftsFolder, input, medusaScripts).start();
+		BufferedReader errors = new BufferedReader(new InputStreamReader(
+				process.getErrorStream()));
+		if (cl.hasOption("v")) {
+			while ((line = errors.readLine()) != null) {
+				System.out.println(line);
+			}
+			if (process.waitFor() != 0) {
+				throw new RuntimeException("Error running MUMmer.");
+			}
+		} else {
+			while ((line = errors.readLine()) != null) {
+			}
+			if (process.waitFor() != 0) {
+				throw new RuntimeException("Error running MUMmer.");
+			}
+		}
+
+		System.out.print("done.\n");
+
 		
+		/*
+		 * ####################################################################### 
+		 * STEP2: The adjacencies collected by MUMmer are used by a python script to populate an
+		 * undirected weighted graph.
+		 * ####################################################################### 
+		 */
+		System.out.println("------------------------------------------------------------------------------------------------------------------------");
+		System.out.print("Building the network...");
+		
+		String current = new java.io.File(".").getCanonicalPath();
+
+		if (cl.hasOption("w2")) {// this weight takes in account the quality of the hits.
+			process = new ProcessBuilder("python", medusaScripts
+					+ "/netcon_mummer.py", "-f" + current, "-i" + input,
+					"-onetwork", "-w").start();
+			errors = new BufferedReader(new InputStreamReader(
+					process.getErrorStream()));
+			while ((line = errors.readLine()) != null) {
+				System.out.println(line);
+			}
+			if (process.waitFor() != 0) {
+				throw new RuntimeException(
+						"Error: Network construction failed.");
+			}
+		} else {// default weight scheme
+			process = new ProcessBuilder("python", medusaScripts
+					+ "/netcon_mummer.py", "-f" + current, "-i" + input,
+					"-onetwork").start();
+			errors = new BufferedReader(new InputStreamReader(
+					process.getErrorStream()));
+			while ((line = errors.readLine()) != null) {
+				System.out.println(line);
+			}
+			if (process.waitFor() != 0) {
+				throw new RuntimeException(
+						"Error: Network construction failed.");
+			}
+		}
+		/*
+		 * The network generated by the python script is stored in an object belonging to the class MyGraph. 
+		 */
 		MyGraph grafo = GexfReader.read("network");
-		 //cancella i file coords and delta e il file network
-		 File network = new File("network");
-		 network.delete();
+
+		// Remove temporary files. 
+		File network = new File("network");
+		network.delete();
 		File dir = new File(".");
 		for (String address : dir.list(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
@@ -257,32 +285,58 @@ public class Scaffolder {
 			File f = new File(address);
 			f.delete();
 		}
-		
-		if(grafo.getEdges().size()==0){
-			System.out.println("SORRY: No information found. Are you sure to have MUMmer packedge location in your PATH? If yes, the chosen drafts genomes don't provide sufficient information for scaffolding the target genome.");
+
+		if (grafo.getEdges().size() == 0) {
+			System.out
+					.println("SORRY: No information found. Are you sure to have MUMmer packedge location in your PATH? If yes, the chosen drafts genomes don't provide sufficient information for scaffolding the target genome.");
 			return;
 		}
 		System.out.print("done.\n");
+		
+		/*
+		 * ####################################################################### 
+		 * STEP3: Giving an order to the contigs.
+		 * The order is assigned by transform the graph into a disjoint path cover.
+		 * This cover is again stored in a MyGraph object.
+		 * ####################################################################### 
+		 */
+		
 		System.out.println("------------------------------------------------------------------------------------------------------------------------");
-
 		System.out.print("Cleaning the network...");
 
 		double factor = 1;
-		for(MyEdge e : grafo.getEdges()){
-			factor=factor+e.getWeight();
+		for (MyEdge e : grafo.getEdges()) {
+			factor = factor + e.getWeight();
 		}
 		MyGraph grafoProvvisorio = new MyGraph(grafo);
 		MyGraph cover = greedyCover(grafoProvvisorio, factor);
-
 		
+		/*
+		 * ####################################################################### 
+		 * STEP4: Give a orientation to the contigs.
+		 * The cover is processed in order to assign an orientation to each contig. 
+		 * The paths of the cover are traversed and, for each node, a consistent orientation is assigned 
+		 * to its sequence.
+		 * ####################################################################### 
+		 */
+
 		cover.cleanOrinetation();
+		
+		/*
+		 * RANDOM OPTION: Give a orientation to the contigs.
+		 * If the random option is present more then one candidate cover is taken in account.
+		 * STEP3 and STEP4 are executed each time, and the best solution is taken.
+		 */
 		if (rounds > 1) {
-			System.out.println("Candidate cover size: "+ cover.getEdges().size());
+			System.out.println("Candidate cover size: "
+					+ cover.getEdges().size());
 			for (int i = 2; i <= rounds; i++) {
-				 grafoProvvisorio = new MyGraph(grafo);
-				MyGraph candidateCover = greedyCoverRandom(grafoProvvisorio, factor);
+				grafoProvvisorio = new MyGraph(grafo);
+				MyGraph candidateCover = greedyCoverRandom(grafoProvvisorio,
+						factor);
 				candidateCover.cleanOrinetation();
-				System.out.println("Candidate cover size: "+ candidateCover.getEdges().size());
+				System.out.println("Candidate cover size: "
+						+ candidateCover.getEdges().size());
 				if (candidateCover.getEdges().size() > cover.getEdges().size()) {
 					cover = candidateCover;
 				}
@@ -290,13 +344,31 @@ public class Scaffolder {
 			System.out.println("Best cover size: " + cover.getEdges().size());
 		}
 		System.out.print("done.\n");
+		
+		
+		/*
+		 * ####################################################################### 
+		 * FINAL OUTPUT: The paths in the cover can be finally read as scaffolds. 
+		 * Each node is now associated to a properly oriented sequence.
+		 * Default and optional output files are created.
+		 * ####################################################################### 
+		 */
 		System.out.println("------------------------------------------------------------------------------------------------------------------------");
-	
-		// ------ create SCAFFOLDS file ---------
-		LinkedHashMap<String, ProteinSequence> a = FastaReaderHelper.readFastaProteinSequence(new File(input));
+
+		/*
+		 * DEFAULT OUTPUTS:
+		 * 
+		 * ouptut: A textual summary of the results.
+		 * output2: A .fasta file containing a sequence for each scaffold.
+		 * 					
+		 */
+		
+		LinkedHashMap<String, ProteinSequence> a = FastaReaderHelper
+				.readFastaProteinSequence(new File(input));
 		HashMap<String, String> sequences = new HashMap<String, String>();
-		for(ProteinSequence s : a.values()){
-			sequences.put(s.getOriginalHeader().split(" ")[0], s.getSequenceAsString());
+		for (ProteinSequence s : a.values()) {
+			sequences.put(s.getOriginalHeader().split(" ")[0],
+					s.getSequenceAsString());
 		}
 		ArrayList<String> scaffolds = cover.readScaffoldsSeq(input, sequences);
 		File outputFile2 = new File(scaffoldsfilename);
@@ -307,196 +379,245 @@ public class Scaffolder {
 			writerOutput2.println(s);
 			j++;
 		}
-		
-		for (MyNode n: cover.getNodes()){
-			if(n.getDegree()==0){
+
+		for (MyNode n : cover.getNodes()) {
+			if (n.getDegree() == 0) {
 				writerOutput2.println(">Scaffold_" + j);
 				writerOutput2.println(sequences.get(n.getId()));
 				j++;
 			}
 		}
-		
+
 		writerOutput2.flush();
 		System.out.println("Scaffolds File saved: " + outputFile2);
-		
+
 		System.out.println("------------------------------------------------------------------------------------------------------------------------");
-		
+
 		File outputFile = new File(input + "_SUMMARY");
 		PrintWriter writerOutput = new PrintWriter(new FileWriter(outputFile));
 		writerOutput.write("Target genome: " + input + "\n");
-		
+
 		writerOutput.println("\n--------------SCAFFOLDS---------------\n");
-		
-		
-		
-		int finalSingletons=(cover.getNodes().size()-cover.notSingletons());
+
+		int finalSingletons = (cover.getNodes().size() - cover.notSingletons());
 		ArrayList<String> paths = cover.subPaths();
 		int totalLength = computeLenght(paths);
 
 		int numberOfScaffolds = paths.size() + finalSingletons;
+
+		System.out.println("Number of scaffolds: " + numberOfScaffolds
+				+ " (singletons = " + finalSingletons
+				+ ", multi-contig scaffold = " + paths.size() + ") \nfrom "
+				+ cover.getNodes().size() + " initial fragments.");
+		System.out.println("Total length of the jointed fragments: "
+				+ totalLength);
+		// old N50 script:
+		//		System.out.print("N50: ");
+		//		process = new ProcessBuilder("python", medusaScripts + "/N50.py",
+		//				scaffoldsfilename).start();
+		//		errors = new BufferedReader(new InputStreamReader(
+		//				process.getInputStream()));
+		//		while ((line = errors.readLine()) != null) {
+		//			System.out.println(line);
+		//		}
+		//		if (process.waitFor() != 0) {
+		//			throw new RuntimeException("Error in avaluating N50.");
+		//		}
+		n50avaluation(scaffoldsfilename);
 		
-		System.out.println("Number of scaffolds: " + numberOfScaffolds + " (singletons = " + finalSingletons + ", multi-contig scaffold = " + paths.size()+") \nfrom " +cover.getNodes().size() +" initial fragments.");
-		System.out.println("Total length of the jointed fragments: " + totalLength);
-		//N50 script:
-		System.out.print("N50: "); process = new ProcessBuilder("python", medusaScripts+"/N50.py", scaffoldsfilename) .start(); 
-		  errors = new BufferedReader(new InputStreamReader( process.getInputStream())); while ((line =
-		  errors.readLine()) != null) { System.out.println(line); } if
-		  (process.waitFor() != 0) { throw new
-		  RuntimeException("Error: Network construction failed."); }
-		
-		writerOutput.println("Number of scaffolds: " + numberOfScaffolds + " (singletons = " + finalSingletons + ", multi-contig scaffold = " + paths.size()+") \nfrom " +cover.getNodes().size() +" initial fragments.");
-		writerOutput.println("Total length of the jointed fragments: " + totalLength);
+
+		writerOutput.println("Number of scaffolds: " + numberOfScaffolds
+				+ " (singletons = " + finalSingletons
+				+ ", multi-contig scaffold = " + paths.size() + ") \nfrom "
+				+ cover.getNodes().size() + " initial fragments.");
+		writerOutput.println("Total length of the jointed fragments: "
+				+ totalLength);
 		writerOutput.flush();
 		System.out.println("Summary File saved: " + outputFile);
-		
-		
-		//-------------OPTIONAL OUTPUTS------------------//
-		
-		if(cl.hasOption("gexf")){
-				System.out.println("------------------------------------------------------------------------------------------------------------------------");
-			GexfWriter.write(grafo, input+"_network.gexf");
-			GexfWriter.write(cover, input+"_cover.gexf");
+
+		/*
+		 * OPTIONAL OUTPUT:
+		 * The network and the cover are outputted in .gexf format.
+		 */
+
+		if (cl.hasOption("gexf")) {
+			System.out
+					.println("------------------------------------------------------------------------------------------------------------------------");
+			GexfWriter.write(grafo, input + "_network.gexf");
+			GexfWriter.write(cover, input + "_cover.gexf");
 		}
-		 if(cl.hasOption("d")){
-				System.out.println("------------------------------------------------------------------------------------------------------------------------");
-			MyGraph.writeDistanceFile(cover, input+"_distanceTable");
+		if (cl.hasOption("d")) {
+			System.out
+					.println("------------------------------------------------------------------------------------------------------------------------");
+			MyGraph.writeDistanceFile(cover, input + "_distanceTable");
 		}
 	}
+
+
+	/*
+	 * ####################################################################### 
+	 * ####################################################################### 
+	 * ADDITIONAL METHODS.
+	 * ####################################################################### 
+	 */
+
 	private MyGraph greedyCoverRandom(MyGraph network, double factor) {
-		ArrayList<MyEdge> candidateEdges = new ArrayList<MyEdge>(network.getEdges());
-		for(MyEdge edge : candidateEdges){
-			double w = edge.getWeight()+factor;
+		ArrayList<MyEdge> candidateEdges = new ArrayList<MyEdge>(
+				network.getEdges());
+		for (MyEdge edge : candidateEdges) {
+			double w = edge.getWeight() + factor;
 			edge.setWeight(w);
-			
+
 		}
 		ArrayList<MyEdge> chosenEdges = new ArrayList<MyEdge>();
-		MyGraph cover = new MyGraph(network.getNodes(),chosenEdges);
-		for(MyNode n : cover.getNodes()){
+		MyGraph cover = new MyGraph(network.getNodes(), chosenEdges);
+		for (MyNode n : cover.getNodes()) {
 			n.setAdj(new ArrayList<MyNode>());
 		}
 		HashMap<MyNode, MyNode> twins = new HashMap<MyNode, MyNode>();
-		for(MyNode n : network.getNodes()){
+		for (MyNode n : network.getNodes()) {
 			twins.put(n, n);
 		}
 		IdComparator comparatorId = new IdComparator();
 		weightComparator comparatorW = new weightComparator();
-		Collections.sort(candidateEdges, comparatorId);//prima li sorta per ID
+		Collections.sort(candidateEdges, comparatorId);// ID sorting
 		Collections.shuffle(candidateEdges);
-		Collections.sort(candidateEdges,comparatorW);//poi li sorta per peso
+		Collections.sort(candidateEdges, comparatorW);// weight sorting
 		Collections.reverse(candidateEdges);
-		while(!candidateEdges.isEmpty()){
-		MyEdge candidate = candidateEdges.get(0);
-		MyNode source = candidate.getSource();
-		MyNode target = candidate.getTarget();
-		if(twins.get(source)==target){
-			candidateEdges.remove(candidate);
-		}else {// se non loro stessi gli estremi di un cammino
-			cover.addEdge(candidate);
-			MyNode ps = twins.get(source);
-			MyNode pt = twins.get(target);
-			twins.put(ps, pt);
-			twins.put(pt, ps);
-			if(cover.nodeFromId(target.getId()).getDegree()>1){
-				ArrayList<MyEdge> a = network.inoutEdges(target);
-				candidateEdges.removeAll(a);
-			}else{
-				candidateEdges.remove(candidate);	
+		while (!candidateEdges.isEmpty()) {
+			MyEdge candidate = candidateEdges.get(0);
+			MyNode source = candidate.getSource();
+			MyNode target = candidate.getTarget();
+			if (twins.get(source) == target) {
+				candidateEdges.remove(candidate);
+			} else {
+				cover.addEdge(candidate);
+				MyNode ps = twins.get(source);
+				MyNode pt = twins.get(target);
+				twins.put(ps, pt);
+				twins.put(pt, ps);
+				if (cover.nodeFromId(target.getId()).getDegree() > 1) {
+					ArrayList<MyEdge> a = network.inoutEdges(target);
+					candidateEdges.removeAll(a);
+				} else {
+					candidateEdges.remove(candidate);
+				}
+				if (cover.nodeFromId(source.getId()).getDegree() > 1) {
+					ArrayList<MyEdge> b = network.inoutEdges(source);
+					candidateEdges.removeAll(b);
+				} else {
+					candidateEdges.remove(candidate);
+				}
 			}
-			if(cover.nodeFromId(source.getId()).getDegree()>1){
-				ArrayList<MyEdge> b = network.inoutEdges(source);
-				candidateEdges.removeAll(b);
-			}
-			else{
-				candidateEdges.remove(candidate);	
-			}
+
 		}
-			
-		}
-	return cover;		
-		
+		return cover;
+
 	}
-
-
-	public static MyGraph greedyCover(MyGraph network, double factor){
-		ArrayList<MyEdge> candidateEdges = new ArrayList<MyEdge>(network.getEdges());
-		for(MyEdge edge : candidateEdges){
-			double w = edge.getWeight()+factor;
+	
+	private static MyGraph greedyCover(MyGraph network, double factor) {
+		ArrayList<MyEdge> candidateEdges = new ArrayList<MyEdge>(
+				network.getEdges());
+		for (MyEdge edge : candidateEdges) {
+			double w = edge.getWeight() + factor;
 			edge.setWeight(w);
-			
+
 		}
 		ArrayList<MyEdge> chosenEdges = new ArrayList<MyEdge>();
-		MyGraph cover = new MyGraph(network.getNodes(),chosenEdges);
-		for(MyNode n : cover.getNodes()){
+		MyGraph cover = new MyGraph(network.getNodes(), chosenEdges);
+		for (MyNode n : cover.getNodes()) {
 			n.setAdj(new ArrayList<MyNode>());
 		}
 		HashMap<MyNode, MyNode> twins = new HashMap<MyNode, MyNode>();
-		for(MyNode n : network.getNodes()){
+		for (MyNode n : network.getNodes()) {
 			twins.put(n, n);
 		}
-		 	IdComparator comparatorId = new IdComparator();
-			Collections.sort(candidateEdges, comparatorId);//prima li sorta per ID
-			weightComparator comparatorW = new weightComparator();
-			Collections.sort(candidateEdges, comparatorW);//poi li sorta per peso
-			Collections.reverse(candidateEdges);
-			
-			/////////
-			for(int i=0;i < candidateEdges.size()-1;i++){
-				if(candidateEdges.get(i).getWeight() < candidateEdges.get(i+1).getWeight()){
-					System.out.println("ERROR: "+ candidateEdges.get(i).toStringVerbose() +" > "+ candidateEdges.get(i+1).toStringVerbose() );
-				} else if(candidateEdges.get(i).getWeight() == candidateEdges.get(i+1).getWeight()){
-			//		System.out.println("=");
+		IdComparator comparatorId = new IdComparator();
+		Collections.sort(candidateEdges, comparatorId);
+		weightComparator comparatorW = new weightComparator();
+		Collections.sort(candidateEdges, comparatorW);
+		Collections.reverse(candidateEdges);
 
-				}else if(candidateEdges.get(i).getWeight() > candidateEdges.get(i+1).getWeight()){
-			//		System.out.println("OK");
+		for (int i = 0; i < candidateEdges.size() - 1; i++) {
+			if (candidateEdges.get(i).getWeight() < candidateEdges.get(i + 1)
+					.getWeight()) {
+				System.out.println("ERROR: "
+						+ candidateEdges.get(i).toStringVerbose() + " > "
+						+ candidateEdges.get(i + 1).toStringVerbose());
+			} else if (candidateEdges.get(i).getWeight() == candidateEdges.get(
+					i + 1).getWeight()) {
 
-				}			
-			}
-			
-			/////////
-			
-		while(!candidateEdges.isEmpty()){
-		MyEdge candidate = candidateEdges.get(0);
-		MyNode source = candidate.getSource();
-		MyNode target = candidate.getTarget();
-		if(twins.get(source)==target){
-			candidateEdges.remove(candidate);
-		}else {// se non loro stessi gli estremi di un cammino
-			cover.addEdge(candidate);
-			MyNode ps = twins.get(source);
-			MyNode pt = twins.get(target);
-			twins.put(ps, pt);
-			twins.put(pt, ps);
-			if(cover.nodeFromId(target.getId()).getDegree()>1){
-				ArrayList<MyEdge> a = network.inoutEdges(target);
-				candidateEdges.removeAll(a);
-			}else{
-				candidateEdges.remove(candidate);	
-			}
-			if(cover.nodeFromId(source.getId()).getDegree()>1){
-				ArrayList<MyEdge> b = network.inoutEdges(source);
-				candidateEdges.removeAll(b);
-			}
-			else{
-				candidateEdges.remove(candidate);	
+			} else if (candidateEdges.get(i).getWeight() > candidateEdges.get(
+					i + 1).getWeight()) {
+
 			}
 		}
-			
+
+
+		while (!candidateEdges.isEmpty()) {
+			MyEdge candidate = candidateEdges.get(0);
+			MyNode source = candidate.getSource();
+			MyNode target = candidate.getTarget();
+			if (twins.get(source) == target) {
+				candidateEdges.remove(candidate);
+			} else {
+				cover.addEdge(candidate);
+				MyNode ps = twins.get(source);
+				MyNode pt = twins.get(target);
+				twins.put(ps, pt);
+				twins.put(pt, ps);
+				if (cover.nodeFromId(target.getId()).getDegree() > 1) {
+					ArrayList<MyEdge> a = network.inoutEdges(target);
+					candidateEdges.removeAll(a);
+				} else {
+					candidateEdges.remove(candidate);
+				}
+				if (cover.nodeFromId(source.getId()).getDegree() > 1) {
+					ArrayList<MyEdge> b = network.inoutEdges(source);
+					candidateEdges.removeAll(b);
+				} else {
+					candidateEdges.remove(candidate);
+				}
+			}
+
 		}
-	return cover;		
-}
+		return cover;
+	}
 	
+	/*
+	 * N50 EVALUATOR:
+	 * This method read a .fasta file and  write on console three values.
+	 * These three values corresponds to the N50 statistic for the given set of sequences
+	 * computed following three different mathematical definitions.
+	 */
 	private void n50avaluation(CommandLine cl) throws Exception {
 		ArrayList<Integer> lenghts = new ArrayList<Integer>();
-		LinkedHashMap<String, ProteinSequence> a = FastaReaderHelper.readFastaProteinSequence(new File(cl.getOptionValue("n50"))); 
-		for (  Entry<String, ProteinSequence> entry : a.entrySet() ) {
+		LinkedHashMap<String, ProteinSequence> a = FastaReaderHelper
+				.readFastaProteinSequence(new File(cl.getOptionValue("n50")));
+		for (Entry<String, ProteinSequence> entry : a.entrySet()) {
 			int l = entry.getValue().getLength();
 			lenghts.add(l);
 		}
-		System.out.println("Number of contigs found: "+lenghts.size());
-		System.out.println("Minimum: "+N50.n50minimum(lenghts));
-		System.out.println("Maximum: "+N50.n50maximum(lenghts));
-		System.out.println("Mean: "+N50.n50mean(lenghts));
+		System.out.println("Number of sequences in the file: " + lenghts.size());
+		System.out.println("Minimum: " + N50.n50minimum(lenghts));
+		System.out.println("Maximum: " + N50.n50maximum(lenghts));
+		System.out.println("Mean: " + N50.n50mean(lenghts));
 		System.out.println("----------------------");
-		
+
+	}
+	
+	private void n50avaluation(String scaffoldsfilename) throws Exception {
+		ArrayList<Integer> lenghts = new ArrayList<Integer>();
+		LinkedHashMap<String, ProteinSequence> a = FastaReaderHelper
+				.readFastaProteinSequence(new File(scaffoldsfilename));
+		for (Entry<String, ProteinSequence> entry : a.entrySet()) {
+			int l = entry.getValue().getLength();
+			lenghts.add(l);
+		}
+		System.out.println("Computing N50 on " + lenghts.size()+ " sequences.");
+		System.out.println("Minimum: " + N50.n50minimum(lenghts));
+		System.out.println("Maximum: " + N50.n50maximum(lenghts));
+		System.out.println("Mean: " + N50.n50mean(lenghts));
+		System.out.println("----------------------");
 	}
 }
