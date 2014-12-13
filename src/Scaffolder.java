@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -25,6 +26,7 @@ import org.biojava3.core.sequence.io.FastaReaderHelper;
 
 import utilities.GexfReader;
 import utilities.GexfWriter;
+import utilities.N50;
 
 public class Scaffolder {
 	public static final int VERSION_MAJOR = 1;
@@ -122,22 +124,33 @@ public class Scaffolder {
 				.create("random");
 		opts.addOption(random);
 
+		Option n50 = OptionBuilder.withArgName("<fastaFile>")
+				.hasArgs(1).withValueSeparator()
+				.withDescription("OPTIONAL PARAMETER; N50 statistics.")
+				.create("n50");
+		opts.addOption(n50);
 
 		BasicParser bp = new BasicParser();
 		try {
 			
 			CommandLine cl = bp.parse(opts, args);
-			if(cl.hasOption("h") || !cl.hasOption("i")){
+			if(cl.hasOption("h") || (!cl.hasOption("i") && !cl.hasOption("n50"))){
 				printHelp(opts);
 			}
 			else if (cl.hasOption("i")) {
 				scaffolderHS(cl);
+			}
+			
+			else if(cl.hasOption("n50")){
+				n50avaluation(cl);
 			}
 		} catch (UnrecognizedOptionException uoe) {
 			printHelp(opts);
 		}
 	}
 	
+
+
 	private void printHelp(Options opts) {
 		System.out.println(String.format("Medusa version %d.%d", VERSION_MAJOR, VERSION_MINOR));
 		HelpFormatter f1 = new HelpFormatter();
@@ -145,68 +158,6 @@ public class Scaffolder {
 	
 	}
 
-
-
-
-	
-	/*public static Double computeN50(MyGraph cover) {
-		int sum = 0;
-		ArrayList<Integer> a = new ArrayList<Integer>();
-		 ArrayList<String> multicontigscaffold = cover.subPaths();
-		String current;
-		for (int i = 0; i <= multicontigscaffold.size()-1; i++) {
-			current = multicontigscaffold.get(i);
-			String[] currentSplit = current.split("@");
-			int le = Integer.parseInt(currentSplit[1].replaceFirst("@", ""));
-			a.add(le);
-			sum=sum+le;
-		}
-		//System.out.println("Total lenght of muticontig Scaffolds="+ sum);
-		for(MyNode s : cover.getNodes()){//aggiunge i singoletti
-			if(s.getDegree()==0){
-				a.add(s.getContiglength());
-				sum=sum+s.getContiglength();
-			}
-		}
-
-		
-		Collections.sort(a);
-		//Collections.reverse(a);		
-		
-		//System.out.println("Total sum of lenghts="+ sum);
-		int index = 0;
-		int partialSum = a.get(0);
-		double n50;
-		while (partialSum < (sum / 2)) {
-			index++;
-			partialSum = partialSum + a.get(index);
-		}
-		n50 = a.get(index);
-		// il minore per
-		// cui sommando tutti i
-		// maggiori uguali si
-		// copre meta luneghezza
-		
-		// Double n50= median(a);
-		// ArrayList<Integer> a = new ArrayList<Integer>();//cosi e' la mediana
-		// della distribuzione delle lunghezze
-		// for(int i: lenghtsMap.keySet()){
-		// int v = lenghtsMap.get(i);
-		// for(int m=0;m<=v;m++){
-		// a.add(i);
-		// }
-		// }
-		// Collections.sort(a);
-		// Double n50= median(a);
-		return n50;
-	}	public static double median(ArrayList<Integer> m) {
-		int middle = m.size() / 2;
-		if (m.size() % 2 == 1) {
-			return m.get(middle);
-		} else {
-			return (m.get(middle - 1) + m.get(middle) / 2.0);
-		}
-	}*/
 
 	private int computeLenght(ArrayList<String> paths) {
 		int l = 0;
@@ -533,4 +484,19 @@ public class Scaffolder {
 		}
 	return cover;		
 }
+	
+	private void n50avaluation(CommandLine cl) throws Exception {
+		ArrayList<Integer> lenghts = new ArrayList<Integer>();
+		LinkedHashMap<String, ProteinSequence> a = FastaReaderHelper.readFastaProteinSequence(new File(cl.getOptionValue("n50"))); 
+		for (  Entry<String, ProteinSequence> entry : a.entrySet() ) {
+			int l = entry.getValue().getLength();
+			lenghts.add(l);
+		}
+		System.out.println("Number of contigs found: "+lenghts.size());
+		System.out.println("Minimum: "+N50.n50minimum(lenghts));
+		System.out.println("Maximum: "+N50.n50maximum(lenghts));
+		System.out.println("Mean: "+N50.n50mean(lenghts));
+		System.out.println("----------------------");
+		
+	}
 }
