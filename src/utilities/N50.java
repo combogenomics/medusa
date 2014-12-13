@@ -54,7 +54,7 @@ public class N50 {
 		}
 		
 		if(partial+lenghts.get(index)==(total/2)){
-			return (lenghts.get(index)+lenghts.get(index+1))/2;
+			return (lenghts.get(index)+lenghts.get(index+1))/2.0;
 		}else{
 			return lenghts.get(index);
 		}
