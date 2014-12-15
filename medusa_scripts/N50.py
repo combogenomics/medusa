@@ -32,7 +32,7 @@ if __name__=="__main__":
 	"""
 	
 	inp=argv[1]
-	try: gap_length=argv[2]
+	try: gap_length=int(argv[2])
 	except: gap_length=0
 	lengths = [len(str(i.seq).replace('N'*gap_length,'')) for i in parse(inp,'fasta')]
 	print int(N50(lengths))
