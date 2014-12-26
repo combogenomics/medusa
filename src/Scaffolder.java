@@ -587,8 +587,7 @@ public class Scaffolder {
 	/*
 	 * N50 EVALUATOR:
 	 * This method read a .fasta file and  write on console three values.
-	 * These three values corresponds to the N50 statistic for the given set of sequences
-	 * computed following three different mathematical definitions.
+	 * These three values corresponds to the N50 statistic for the given set of sequences.
 	 */
 	private void n50avaluation(CommandLine cl) throws Exception {
 		ArrayList<Integer> lenghts = new ArrayList<Integer>();
@@ -599,9 +598,7 @@ public class Scaffolder {
 			lenghts.add(l);
 		}
 		System.out.println("Number of sequences in the file: " + lenghts.size());
-		System.out.println("Minimum: " + N50.n50minimum(lenghts));
-		System.out.println("Maximum: " + N50.n50maximum(lenghts));
-		System.out.println("Mean: " + N50.n50mean(lenghts));
+		System.out.println("N50: " + N50.n50(lenghts));
 		System.out.println("----------------------");
 
 	}
@@ -615,9 +612,7 @@ public class Scaffolder {
 			lenghts.add(l);
 		}
 		System.out.println("Computing N50 on " + lenghts.size()+ " sequences.");
-		System.out.println("Minimum: " + N50.n50minimum(lenghts));
-		System.out.println("Maximum: " + N50.n50maximum(lenghts));
-		System.out.println("Mean: " + N50.n50mean(lenghts));
+		System.out.println("N50: " + N50.n50(lenghts));
 		System.out.println("----------------------");
 	}
 }
