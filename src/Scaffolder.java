@@ -134,7 +134,7 @@ public class Scaffolder {
 					|| (!cl.hasOption("i") && !cl.hasOption("n50"))) {
 				printHelp(opts);
 			} else if (cl.hasOption("i")) {
-				scaffolderHS(cl);
+				scaffolder(cl);
 			}
 
 			else if (cl.hasOption("n50")) {
@@ -166,7 +166,7 @@ public class Scaffolder {
 		return l;
 	}
 
-	private void scaffolderHS(CommandLine cl) throws Exception {
+	private void scaffolder(CommandLine cl) throws Exception {
 
 		String input = cl.getOptionValues("i")[0];
 		System.out.println("INPUT FILE:" + input);
@@ -411,18 +411,6 @@ public class Scaffolder {
 				+ cover.getNodes().size() + " initial fragments.");
 		System.out.println("Total length of the jointed fragments: "
 				+ totalLength);
-		// old N50 script:
-		//		System.out.print("N50: ");
-		//		process = new ProcessBuilder("python", medusaScripts + "/N50.py",
-		//				scaffoldsfilename).start();
-		//		errors = new BufferedReader(new InputStreamReader(
-		//				process.getInputStream()));
-		//		while ((line = errors.readLine()) != null) {
-		//			System.out.println(line);
-		//		}
-		//		if (process.waitFor() != 0) {
-		//			throw new RuntimeException("Error in avaluating N50.");
-		//		}
 		n50avaluation(scaffoldsfilename);
 		
 

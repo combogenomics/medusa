@@ -63,11 +63,9 @@ public class MyGraph {
 	public double cost() {
 		double c = 0;
 		for (MyEdge e : this.getEdges()) {
-			// System.out.println(e.getId()+" ha peso "+e.getWeight());
 			c = c + e.getWeight();
 
 		}
-		// System.out.println("Total:"+c);
 		return c;
 	}
 
@@ -172,7 +170,7 @@ public class MyGraph {
 	}
 
 	public String toString() {
-		String s = "Nodes(" + nodes.size() + ")"// + nodes.toString() + "\n"
+		String s = "Nodes(" + nodes.size() + ")"
 				+ "Edges(" + edges.size() + ")=" + edges.toString();
 		return s;
 
@@ -214,12 +212,11 @@ public class MyGraph {
 			if (copy.nodes.size() <= 1) {
 				throw new RuntimeException(
 						"Only singletons found."
-								+ copy.toStringVerbose());// TODO
+								+ copy.toStringVerbose());
 			}
 			MyNode root = null;
 			for (MyNode r : copy.nodes) {
-				if (r.getDegree() == 1) {// cerca una foglia di copy da cui
-											// partire.
+				if (r.getDegree() == 1) {
 					root = r;
 					break;
 				}
@@ -249,10 +246,6 @@ public class MyGraph {
 		}
 	}
 
-	/*
-	 * Serve per eliminare da una serie di paths quelli ciclici rimuovendo
-	 * l'arco piu' leggero
-	 */
 	public void removeRings() {
 		ArrayList<MyEdge> toRemove = new ArrayList<MyEdge>();
 		ArrayList<MyNode> toVisit = new ArrayList<MyNode>(this.nodes);
@@ -271,13 +264,11 @@ public class MyGraph {
 		}
 	}
 
-	/* controlla se il path e' un ciclo e ritorna l'arco di peso minore */
 	private MyEdge findCycle(MyNode n) {
 		MyNode current = n;
 		MyNode next;
 
-		MyEdge e = this.outEdges(current).get(0);// sceglie una direzione a caso
-													// da seguire.
+		MyEdge e = this.outEdges(current).get(0);
 		MyEdge min = e;
 		MyEdge candidateEdge = e;
 		if (current.equals(e.getSource())) {
@@ -298,16 +289,14 @@ public class MyGraph {
 			}
 		}
 		if (next.getDegree() == 1) {
-			// ero in un path semplice
+			
 			return null;
 		} else {
-			// ero in un circolo
-			return min;
+						return min;
 		}
 
 	}
 
-	/* questa versione stampa le label e la lunghezza */
 	private String clearPrintSB(MyNode root,
 			HashMap<MyNode, Integer> originalDegrees) {
 		StringBuilder sb = new StringBuilder();
@@ -360,23 +349,16 @@ public class MyGraph {
 	}
 
 	public void setInfo(HashMap<String, String[]> info) {
-		// System.out.println("TRADUZIONE LABEL");//DEBUG
 		int j = 0;
 		for (MyNode n : nodes) {
 			String[] nodeInfo = info.get(n.getId());
 			if (nodeInfo == null) {
-				// n.setLabel(null);
 				n.setLabel("label" + String.valueOf(j));
 				j++;
-				// just debug--------
-				// System.out.println(n.getId()+"--->"+n.getLabel());
-				// -------------
 			} else {
 				n.setLabel(nodeInfo[0]);
 				n.setContiglength(Integer.valueOf(nodeInfo[1]));
-				// just debug--------
-				// System.out.println(n.getId()+"--->"+nodeInfo[0]);
-				// -------------
+
 			}
 
 		}
@@ -384,7 +366,6 @@ public class MyGraph {
 	}
 
 	public MyGraph computeCover() {
-		// minor numero di componenti e, tra queste, una di massimo peso.
 		MyGraph cover = new MyGraph(this);
 		ArrayList<MyNode> leaves = cover.getLeaves();
 		while (!cover.isPaths()) {
@@ -403,18 +384,8 @@ public class MyGraph {
 		return cover;
 	}
 
-	/*
-	 * private ArrayList<MyEdge> computeCuts(MyNode n) { ArrayList<MyEdge>
-	 * notToCut = new ArrayList<MyEdge>(outEdges(n)); ArrayList<MyEdge> cuts =
-	 * new ArrayList<MyEdge>(); Collections.sort(notToCut, new
-	 * WeightComparator()); while(notToCut.size()==2){ MyEdge e=
-	 * notToCut.get(0); cuts.add(e); notToCut.remove(e); } return cuts;
-	 * 
-	 * }
-	 */
 
 	public MyGraph computeCover3() {
-		// minor numero di componenti.
 		MyGraph cover = new MyGraph(this);
 		ArrayList<MyNode> leaves = cover.getLeaves();
 		while (!cover.isPaths()) {
@@ -434,8 +405,6 @@ public class MyGraph {
 	}
 
 	public MyGraph computeCover4() {
-		// euristica. Tiene i piu' pesanti ma il peso di quelli condivisi viene
-		// dimezzato
 		MyGraph cover = new MyGraph(this);
 		ArrayList<MyNode> hightDegreeNodes = new ArrayList<MyNode>();
 		for (MyNode n : cover.getNodes()) {
@@ -444,7 +413,6 @@ public class MyGraph {
 			}
 		}
 		for (MyNode node : hightDegreeNodes) {
-			// dimezza il peso degli archi che non sono vine
 			for (MyEdge edge : cover.outEdges(node)) {
 				if (cover.isNotVine(node, edge)) {
 					double oldW = edge.getWeight();
@@ -469,23 +437,13 @@ public class MyGraph {
 		return cover;
 	}
 
-	/*
-	 * private ArrayList<MyEdge> findCuts(MyNode current) { ArrayList<MyEdge>
-	 * cuts= new ArrayList<MyEdge>(outEdges(current)); ArrayList<MyEdge>
-	 * notToCut = new ArrayList<MyEdge>(); int i =0; while(notToCut.size()!=2){
-	 * MyEdge candidate = cuts.get(i); if(!isNotVine(current, candidate)){
-	 * notToCut.add(candidate); } i=i+1; } return cuts;
-	 * 
-	 * }
-	 */
-
 	private ArrayList<MyEdge> followTheVine(MyNode current) {
 
 		if (current.getDegree() == 0) {
 			return null;
 		}
 		MyNode first;
-		MyEdge e = this.outEdges(current).get(0);// unico in una foglia
+		MyEdge e = this.outEdges(current).get(0);
 		if (current.equals(e.getSource())) {
 			first = e.getTarget();
 		} else {
@@ -501,10 +459,9 @@ public class MyGraph {
 		}
 		ArrayList<MyEdge> cuts;
 		if (next.getDegree() == 1) {
-			// ero in un path
+			
 			cuts = null;
 		} else {
-			// ho trovato un nodo di incrocio
 			cuts = new ArrayList<MyEdge>();
 			ArrayList<MyEdge> save = new ArrayList<MyEdge>(this.outEdges(next));
 			ArrayList<MyEdge> toRemove = new ArrayList<MyEdge>();
@@ -684,38 +641,7 @@ public class MyGraph {
 		return leaves;
 	}
 
-/*	public ArrayList<String> readScaffolds(String input) throws IOException {
-		HashMap<String, String> sequences = parseSequences(input);
-		ArrayList<String> scaffolds = new ArrayList<String>();
-		MyGraph copy = new MyGraph(this);
-		HashMap<MyNode, Integer> originalDegrees = new HashMap<MyNode, Integer>();
-		// ----legge i singoletti e aggiorna la mappa dei gradi---//
-		for (MyNode n : copy.nodes) {
-			originalDegrees.put(n, n.getDegree());
-			if (n.getDegree() == 0) {
-				scaffolds.add(sequences.get(">" + n.getId()));
-			}
-		}
-		// --legge i veri scaffolds---//
-		while (copy.nodes.size() >= 2) {
-			copy.removeSingletons();
-			MyNode root = null;
-			for (MyNode r : copy.getLeaves()) {
-				if (r.equals(this.outEdges(r).get(0).getSource())) {// cerca una foglia di copy da cui
-											// partire.
-					root = r;
-					break;
-				}
-			}
-			if (root == null) {
-				System.out.println("ERROR: no root ");
-			}
-			String p = copy.scaffoldSeq(root, originalDegrees, sequences);
-			scaffolds.add(p);
-		}
 
-		return scaffolds;
-	}*/
 
 	private HashMap<String, String> parseSequences(String input)
 			throws IOException {
@@ -740,46 +666,6 @@ public class MyGraph {
 		return sequences;
 	}
 
-/*	private String scaffoldSeq(MyNode root,
-			HashMap<MyNode, Integer> originalDegrees,
-			HashMap<String, String> sequences) {
-		StringBuilder sb = new StringBuilder();
-
-		String rootSeq = sequences.get(root.getId());
-		if (root.getOrientation() == -1) {
-			reverseComplement(rootSeq);
-		}
-		sb.append(rootSeq);
-		MyNode current = root.getAdj().get(0);
-		MyEdge start = this.getEdgeByST(root, current);
-		for (int i = 1; i <= 100; i++) {// aggiunge N tra un contiguo e l'altro.
-			sb.append("N");
-		}
-		this.removeEdge(start);
-		this.removeNode(root);
-		while (originalDegrees.get(current) == 2) {
-			String currentSeq = sequences.get(current.getId());
-			if (current.getOrientation() == -1) {
-				reverseComplement(currentSeq);
-			}
-			sb.append(currentSeq);
-			MyNode next = current.getAdj().get(0);
-			MyEdge e = this.getEdgeByST(current, next);
-			for (int i = 1; i <= 100; i++) {// aggiunge N tra un contiguo e l'altro.
-				sb.append("N");
-			}
-			this.removeEdge(e);
-			this.removeNode(current);
-			current = next;
-		}
-		String currentSeq = sequences.get(current.getId());
-		if (current.getOrientation() == -1) {
-			reverseComplement(currentSeq);
-		}
-		sb.append(currentSeq);
-		String p = sb.toString();
-		return p;
-	}*/
 
 	public static String reverseComplement(String currentSeq) {
 		String s = currentSeq.replace("A", "a");
@@ -807,7 +693,7 @@ public class MyGraph {
 			MyEdge e = copy.outEdges(current).get(0);
 			MyNode next = current.getAdj().get(0);
 			if (current.equals(e.getSource())) {
-				//vengo dalla source
+				
 				int o0 = e.orientations.get(0)[0];
 				int o1 = e.orientations.get(0)[1];
 				
@@ -816,7 +702,7 @@ public class MyGraph {
 					current.setOrientation(o0);
 					next.setOrientation(o1);
 				} else if(e.orientations.size()>1){
-					int o20 = e.orientations.get(1)[0];//possibilita 2
+					int o20 = e.orientations.get(1)[0];
 					int o21 = e.orientations.get(1)[1];
 					if (o20 == current.getOrientation()
 							|| current.getOrientation() == 100) {
@@ -834,7 +720,7 @@ public class MyGraph {
 					
 					
 			} else {
-				//se vengo dal target rigiro l'arco e rimuovo quello vecchio
+				
 				int o0 = e.orientations.get(0)[1] * (-1);
 				int o1 = e.orientations.get(0)[0] * (-1);
 				int[] convertedOrientations = new int[2];
@@ -850,9 +736,8 @@ public class MyGraph {
 					ArrayList<int[]> or = new ArrayList<int[]>();
 					or.add(convertedOrientations);
 					newEdge.setOrientations(or);
-					toBeAdded.add(newEdge);//aggiungo al grafo il nuovo arco
-					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
-					toBeSubstitute.add(truedge);//tolgo quello vecchio
+					toBeAdded.add(newEdge);					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
+					toBeSubstitute.add(truedge);
 				} else if(e.orientations.size()>1){
 					int o01 = e.orientations.get(1)[1] * (-1);
 					int o11 = e.orientations.get(1)[0] * (-1);
@@ -867,18 +752,18 @@ public class MyGraph {
 						ArrayList<int[]> or = new ArrayList<int[]>();
 						or.add(convertedOrientations1);
 						newEdge.setOrientations(or);
-						toBeAdded.add(newEdge);//aggiungo al grafo il nuovo arco
+						toBeAdded.add(newEdge);
 						MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
 						toBeSubstitute.add(truedge);
 					}
 				else{
 					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
-				toBeRemoved.add(truedge);//tolgo quello vecchio
+				toBeRemoved.add(truedge);
 				}
 					
 				}else{
 					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
-				toBeRemoved.add(truedge);//tolgo quello vecchio
+				toBeRemoved.add(truedge);
 				}
 
 			}
@@ -902,7 +787,6 @@ public class MyGraph {
 		for (MyNode n : copy.nodes) {
 			MyNode node = this.nodeFromId(n.getId());
 			if(n.getOrientation()!=100){
-			//System.out.println(node.getId()+"="+n.getOrientation());
 			node.setOrientation(n.getOrientation());
 			}else{
 				node.setOrientation(1);	
@@ -920,7 +804,6 @@ public class MyGraph {
 	public static MyGraph readGraphFromInfoFile( String infoFileName) throws IOException{
 		MyGraph g = new MyGraph();
 		BufferedReader reader= new BufferedReader(new FileReader(infoFileName));
-		//leggo il primo nodo
 		int index =0;
 		String current = reader.readLine();
 		String[] info1 = current.split("\t");
@@ -967,20 +850,16 @@ public class MyGraph {
 		ArrayList<String> scaffolds = new ArrayList<String>();
 		MyGraph copy = new MyGraph(this);
 		HashMap<MyNode, Integer> originalDegrees = new HashMap<MyNode, Integer>();
-		// ----legge i singoletti e aggiorna la mappa dei gradi---//
+		// ----singletons---//
 		for (MyNode n : copy.nodes) {
 			originalDegrees.put(n, n.getDegree());
-			//if (n.getDegree() == 0) {//non mette i singoletti nel file!!
-			//	scaffolds.add(n.getId());
-			//}
 		}
-		// --legge i veri scaffolds---//
+		// --read the scaffolds---//
 		while (copy.nodes.size() >= 2) {
 			copy.removeSingletons();
 			MyNode root = null;
 			for (MyNode r : copy.getLeaves()) {
-					if(r.equals(this.outEdges(r).get(0).getSource())) {// cerca una foglia di copy da cui
-											// partire.
+					if(r.equals(this.outEdges(r).get(0).getSource())) {
 					root = r;
 					break;
 				}
@@ -1000,20 +879,15 @@ public class MyGraph {
 		HashMap<MyNode, Integer> originalDegrees = new HashMap<MyNode, Integer>();
 		MyGraph copy = new MyGraph(this);
 		ArrayList<String> scaffolds = new ArrayList<String>();
-		// ----legge i singoletti e aggiorna la mappa dei gradi---//
 		for (MyNode n : copy.nodes) {
 			originalDegrees.put(n, n.getDegree());
-		//	if (n.getDegree() == 0) {// mette i singoletti nel file!!
-		//		scaffolds.add(sequences.get(n.getId()));
-		//	}
 		}
-		// --legge i veri scaffolds---//
+		// --read the scaffolds---//
 		while (copy.nodes.size() >= 2) {
 			copy.removeSingletons();
 			MyNode root = null;
 			for (MyNode r : copy.getLeaves()) {
-					if(r.equals(this.outEdges(r).get(0).getSource())) {// cerca una foglia di copy da cui
-											// partire.
+					if(r.equals(this.outEdges(r).get(0).getSource())) {
 					root = r;
 					break;
 				}
@@ -1023,7 +897,6 @@ public class MyGraph {
 				System.out.println("Leaves:"+copy.getLeaves().toString());
 			}
 			String p = copy.scaffoldStringSeq(root, originalDegrees, sequences);
-			//String p = copy.scaffoldSeq(root, originalDegrees, sequences);
 			
 			scaffolds.add(p);
 		}
@@ -1041,7 +914,7 @@ public class MyGraph {
 		   MyNode b = reference.nodeFromId(e.getTarget().getId());
 		   MyEdge edge = reference.getEdgeByST(a, b);
 			if(edge!=null){
-				if(a.getId().equals(edge.getSource().getId())){//source=source
+				if(a.getId().equals(edge.getSource().getId())){
 					if(a.getOrientation()!=e.getSource().getOrientation()||b.getOrientation()!=e.getTarget().getOrientation()){
 						wrongoriented++;
 					}
@@ -1051,7 +924,6 @@ public class MyGraph {
 					}
 				
 			}else{
-				//System.out.println("misplacements: "+e.getId());
 				misplacements++;
 			}
 		}
@@ -1106,7 +978,9 @@ public class MyGraph {
 		sb.append(rootSeq);
 		MyNode current = root.getAdj().get(0);
 		MyEdge start = this.getEdgeByST(root, current);
-		sb.append("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+		if(start.getLenght()!=0){
+			sb.append("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+		}
 		this.removeEdge(start);
 		this.removeNode(root);
 		String currentSeq;
@@ -1119,7 +993,9 @@ public class MyGraph {
 			sb.append(currentSeq);
 			MyNode next = current.getAdj().get(0);
 			MyEdge e = this.getEdgeByST(current, next);
-			sb.append("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+			if(e.getLenght()!=0){
+				sb.append("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+			}
 			this.removeEdge(e);
 			this.removeNode(current);
 			current = next;
