@@ -27,12 +27,14 @@ if __name__=='__main__':
 	help="use a weighting scheme based on sequence similarity")
 	group2.add_option("-t", "--testing", dest="testing", action="store_true",default=False,
 	help="outputs a pkl object for testing [OLD]")
+	group2.add_option("-g", "--gap", dest="gap",default=1,
+	help="choose how to compute gap length: 1 mean, 2 median, 3 most similar")
 	parser.add_option_group(group2)
 	(options, args) = parser.parse_args()
 	if not options.query_genome or not options.mapping_dir or not options.out:
 		parser.print_help()
 		parser.error('Mandatory Arguments missing')
-	query_genome,mapping_dir,out,scheme,testing=options.query_genome,options.mapping_dir,options.out,options.scheme,options.testing
+	query_genome,mapping_dir,out,scheme,testing,gap=options.query_genome,options.mapping_dir,options.out,options.scheme,options.testing,int(options.gap)
 	if not mapping_dir.endswith('/'): mapping_dir+='/'
 	
 ######################################
@@ -46,42 +48,74 @@ def sort_(clusters):
 			edges.append((cl[i],cl[i+1]))
 	return edges
 
-def update_edges(G,Edge):
-	u,v,distance,orientation,weight=Edge.name1,Edge.name2,Edge.distance,Edge.orientation,Edge.weight
+def update_edges_(G,Edge):
+	""" old function """
+	u,v,distance,orientation,weight,seqSimilarity=Edge.name1,Edge.name2,Edge.distance,Edge.orientation,Edge.weight,Edge.seqSimilarity
 	w=G.get_edge_data(u,v,{'weight':0})['weight'] + weight
 	d=G.get_edge_data(u,v,{'distance':0})['distance'] + distance
 	o=G.get_edge_data(u,v,{'orientation':[]})['orientation']
 	o.append(orientation)
 	G.add_edge(u,v,weight=w,distance=d,orientation=o)
 	
-def update_edges_(G,Edge):
-	""" testing function, """
-	u,v,distance,orientation,weight=Edge.name1,Edge.name2,Edge.distance,Edge.orientation,Edge.weight
+def update_edges(G,Edge):
+	u,v,distance,orientation,weight,seqSimilarity=Edge.name1,Edge.name2,Edge.distance,Edge.orientation,Edge.weight,Edge.seqSimilarity
 	w=G.get_edge_data(u,v,{'weight':0})['weight'] + weight
 	d=G.get_edge_data(u,v,{'distance':[]})['distance'] + [distance]
 	o=G.get_edge_data(u,v,{'orientation':[]})['orientation']
+	s=G.get_edge_data(u,v,{'seqSim':[]})['seqSim'] + [seqSimilarity]
 	o.append(orientation)
-	G.add_edge(u,v,weight=w,distance=d,orientation=o)
+	G.add_edge(u,v,weight=w,distance=d,orientation=o,seqSim=s)
 	
-def compute_distances(G):
+def compute_distances(G,method=1,outlier=1):
 	""" Estimate the distance for each edge """
 	import numpy as np
 	for u,v in G.edges():
 		distances=np.array(G[u][v]['distance'])
-		dist=distanceEstimation(distances)
+		seqSims=np.array(G[u][v]['seqSim'])
+		if method==1: dist=distanceEstimation_mean(distances,outlier)
+		elif method==2: dist=distanceEstimation_median(distances,outlier)
+		elif method==3: dist=distanceEstimation_MSH(distances,seqSims,outlier)
+		else: dist=distanceEstimation_mean(distances,outlier)
 		G[u][v]['distance']=dist
-	
-def distanceEstimation(dist_list,method=1):
+		G[u][v]['seqSim']=''
+
+def distanceEstimation_mean(dist_list,method=1):
 	""" Estimate the distance between two contigs, by computing the
 		average of all distances found for these in the reference 
 		genomes. A method for outlier detection is used in order to
 		obtain reliable mean."""
+	#print "using mean..."
 	import numpy as np
 	v=np.array(dist_list)
 	if method == 1: mask=madBasedOutlier(v)
 	else: mask=percentileBasedOutlier(v)
 	distance=v[-mask].mean()
-	return distance
+	return int(distance)
+
+def distanceEstimation_median(dist_list,method=1):
+	""" As the mother function, except that it uses the median instead
+		of the mean."""
+	#print "using median..."
+	import numpy as np
+	v=np.array(dist_list)
+	return int(np.median(v))
+	# try to remove outlier detection?
+	#if method == 1: mask=madBasedOutlier(v)
+	#else: mask=percentileBasedOutlier(v)
+	#distance=np.median(v[-mask])
+	#return distance
+
+def distanceEstimation_MSH(dist_list,seqSim_list,method=1):
+	""" As the mother function, except that it uses the most similar
+		hit's distance."""
+	#print "using most similar hit..."
+	import numpy as np
+	similarities,v=np.array(seqSim_list),np.array(dist_list)
+	# should remove outlier detection here
+	if method == 1: mask=madBasedOutlier(v)
+	else: mask=percentileBasedOutlier(v)
+	distance=v[np.where(max(similarities))][0]
+	return int(distance)
 
 def madBasedOutlier(points, thresh=3.5):
 	""" return outliers based on median-absolute-deviation (MAD) 
@@ -160,10 +194,11 @@ class Edge(object):
 	def __init__(self,hit1,hit2,wscheme=0):
 		self.name1,self.name2=hit1.query,hit2.query
 		self.distance=hit1.distance_from(hit2)
+		self.seqSimilarity=hit1.weight2+hit2.weight2
 		doMapWithin(hit1,hit2)
 		self.orientation=format_orientation_string(hit1,hit2)
 		if wscheme==0:self.weight=1
-		else: self.weight=hit1.weight2+hit2.weight2
+		else: self.weight=self.seqSimilarity
 
 ######################################
 if __name__ == '__main__':
@@ -180,6 +215,6 @@ if __name__ == '__main__':
 	#embed()
 	print('adjusting orientations')
 	adjust_orientations(G)
-	if testing: compute_distances(G)
+	compute_distances(G,method=gap)
 	if not testing: nx.write_gexf(G,out)
 	else: dump(G,open(out,'w'))
