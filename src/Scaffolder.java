@@ -187,6 +187,10 @@ public class Scaffolder {
 		if (cl.getOptionValue("scriptPath") != null) {
 			medusaScripts = cl.getOptionValue("scriptPath");
 		}
+		Boolean distanceEstimation =false;
+		if(cl.hasOption("d")){
+			distanceEstimation = true;
+		}
 	
 		
 		/*
@@ -370,7 +374,8 @@ public class Scaffolder {
 			sequences.put(s.getOriginalHeader().split(" ")[0],
 					s.getSequenceAsString());
 		}
-		ArrayList<String> scaffolds = cover.readScaffoldsSeq(input, sequences);
+		
+		ArrayList<String> scaffolds = cover.readScaffoldsSeq(input, sequences, distanceEstimation);
 		File outputFile2 = new File(scaffoldsfilename);
 		PrintWriter writerOutput2 = new PrintWriter(new FileWriter(outputFile2));
 		int j = 1;

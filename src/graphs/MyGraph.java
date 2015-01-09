@@ -847,6 +847,7 @@ public class MyGraph {
 	}
 
 	public ArrayList<String> readNodeOrder(String input) throws IOException {
+		Boolean distanceEstimation = true; 
 		ArrayList<String> scaffolds = new ArrayList<String>();
 		MyGraph copy = new MyGraph(this);
 		HashMap<MyNode, Integer> originalDegrees = new HashMap<MyNode, Integer>();
@@ -868,14 +869,14 @@ public class MyGraph {
 				System.out.println("ERROR: no root ");
 				System.out.println("Leaves:"+copy.getLeaves().toString());
 			}
-			String p = copy.scaffoldString(root, originalDegrees);
+			String p = copy.scaffoldString(root, originalDegrees,distanceEstimation);
 			scaffolds.add(p);
 		}
 
 		return scaffolds;
 	}
 	
-	public ArrayList<String> readScaffoldsSeq(String input, HashMap<String, String> sequences) throws Exception {
+	public ArrayList<String> readScaffoldsSeq(String input, HashMap<String, String> sequences, Boolean distanceEstimation) throws Exception {
 		HashMap<MyNode, Integer> originalDegrees = new HashMap<MyNode, Integer>();
 		MyGraph copy = new MyGraph(this);
 		ArrayList<String> scaffolds = new ArrayList<String>();
@@ -896,7 +897,14 @@ public class MyGraph {
 				System.out.println("ERROR: no root ");
 				System.out.println("Leaves:"+copy.getLeaves().toString());
 			}
-			String p = copy.scaffoldStringSeq(root, originalDegrees, sequences);
+			
+			String p;
+			if(distanceEstimation){
+				 p = copy.scaffoldStringSeqDistance(root, originalDegrees, sequences);
+			}else{
+				 p = copy.scaffoldStringSeq(root, originalDegrees, sequences);	
+			}
+			
 			
 			scaffolds.add(p);
 		}
@@ -941,7 +949,7 @@ public class MyGraph {
 	}
 
 	private String scaffoldString(MyNode root,
-			HashMap<MyNode, Integer> originalDegrees) {
+			HashMap<MyNode, Integer> originalDegrees, Boolean distanceEstimation) {
 		StringBuilder sb = new StringBuilder();
 
 		String rootSeq=root.getId()+":"+root.getOrientation();
@@ -1009,6 +1017,51 @@ public class MyGraph {
 		String p = sb.toString();
 		return p;
 	}
+	//----------------------Gaps Lengths Estimation------------------------------------//
+	
+	private String scaffoldStringSeqDistance(MyNode root, HashMap<MyNode, Integer> originalDegrees, HashMap<String, String> sequences) {
+		StringBuilder sb = new StringBuilder();
+		String rootSeq;
+		if(root.getOrientation()==-1){
+			rootSeq = reverseComplement(sequences.get(root.getId()));
+		} else{
+			rootSeq= sequences.get(root.getId());	
+		}
+		sb.append(rootSeq);
+		MyNode current = root.getAdj().get(0);
+		MyEdge start = this.getEdgeByST(root, current);
+			for(int i=0; i<start.getLenght(); i++){
+			sb.append("N");	
+			}
+		this.removeEdge(start);
+		this.removeNode(root);
+		String currentSeq;
+		while (originalDegrees.get(current) == 2) {			
+			if(current.getOrientation()==-1){
+				 currentSeq = reverseComplement(sequences.get(current.getId()));	
+			} else{
+			 currentSeq = sequences.get(current.getId());	
+			}
+			sb.append(currentSeq);
+			MyNode next = current.getAdj().get(0);
+			MyEdge e = this.getEdgeByST(current, next);
+			for(int i=0; i<e.getLenght(); i++){
+				sb.append("N");	
+				}	
+			this.removeEdge(e);
+			this.removeNode(current);
+			current = next;
+		}
+		if(current.getOrientation()==-1){
+			 currentSeq = reverseComplement(sequences.get(current.getId()));	
+		} else{
+		 currentSeq = sequences.get(current.getId());	
+		}
+		sb.append(currentSeq);
+		String p = sb.toString();
+		return p;
+	}
+
 
 	public static void writeDistanceFile(MyGraph grafo, String fileName) throws IOException {
 		File outputFile = new File(fileName);
