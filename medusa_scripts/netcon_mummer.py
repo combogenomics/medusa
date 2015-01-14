@@ -122,7 +122,8 @@ def madBasedOutlier(points, thresh=3.5):
 		This performs better on small data samples (<20).
 		Require numpy object."""
 	import numpy as np
-	from IPython import embed
+	np.seterr(divide='ignore', invalid='ignore')
+	#from IPython import embed
 	if len(points.shape) == 1: points = points[:,None]
 	median = np.median(points, axis=0)
 	diff = np.sum((points - median)**2, axis=-1)
