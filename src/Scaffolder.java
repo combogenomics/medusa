@@ -49,7 +49,7 @@ public class Scaffolder {
 				.hasArgs(1)
 				.withValueSeparator()
 				.withDescription(
-						"REQUIRED PARAMETER; File name of the fasta file of the target genome.")
+						"REQUIRED PARAMETER;The option *-i* indicates the name of the target genome file.")
 				.create("i");
 		opts.addOption(input);
 
@@ -58,7 +58,7 @@ public class Scaffolder {
 				.hasArgs(1)
 				.withValueSeparator()
 				.withDescription(
-						"OPTIONAL PARAMETER; Ouptut file name. Default value: input.Scaffold.fasta")
+						"OPTIONAL PARAMETER; The option *-o* indicates the name of output fasta file.")
 				.create("o");
 		opts.addOption(output);
 
@@ -67,7 +67,7 @@ public class Scaffolder {
 				.hasArgs(1)
 				.withValueSeparator()
 				.withDescription(
-						"OPTIONAL PARAMETER; The folder containing the comparison genomes. Default value: drafts")
+						"OPTIONAL PARAMETER; The option *-f* is optional and indicates the path to the comparison drafts folder")
 				.create("f");
 		opts.addOption(f);
 
@@ -83,13 +83,13 @@ public class Scaffolder {
 		Option verbose = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
-						"OPTIONAL PARAMETER;The stdout of MUMmer is printed on console.")
+						"RECOMMENDED PARAMETER; The option *-v* (recommended) print on console the information given by the package MUMmer. This option is strongly suggested to understand if MUMmer is not running properly.")
 				.create("v");
 		opts.addOption(verbose);
 		Option weightScheme2 = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
-						"OPTIONAL PARAMETER;The weight of a join is evaluated taking in account similarity and coverage of the sequences.")
+						"OPTIONAL PARAMETER;The option *-w2* is optional and allows for a sequence similarity based weighting scheme. Using a different weighting scheme may lead to better results.")
 				.create("w2");
 		opts.addOption(weightScheme2);
 
