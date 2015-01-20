@@ -106,13 +106,19 @@ You can now run the java application with the following parameters:
     based weighting scheme. Using a different weighting scheme may lead
     to better results.
 
-7.  The option *-d* outputs a file indicating the estimated distances
-    between pair of contigs (<contig A> <contig B> <estimated distance>).
+7. The option *-d* allows for the estimation of the distance between pairs of contigs based on the reference genome(s):
+	in this case the scaffolded contigs will be separated by a number of N characters equal to this estimate.
+	The estimated distances are also saved in the "_distanceTable" file.
+	By default the scaffolded contigs are separated by 100 Ns.
 	
 8. The *-gexf* is optional. With this option the gexf format of the contig network and
 	the path cover are porvided.
 
-9.  Finally the *-h* option provides a small recap of the previous ones.
+9.  The option *-n50* allows the calculation of the N50 statistic on a FASTA file. 
+	In this case the usage is the following: java -jar medusa.jar -n50 <name_of_the_fasta>
+	All the other options have to be omitted.
+
+10. Finally the *-h* option provides a small recap of the previous ones.
 
 The Medusa archive
 ------------------
