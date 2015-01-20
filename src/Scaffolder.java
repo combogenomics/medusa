@@ -107,7 +107,7 @@ public class Scaffolder {
 		Option distances = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
-						"OPTIONAL PARAMETER;For each joint an estimation of the lenght of the gap is provided. This information is contained in the file *_distanceTable")
+						"OPTIONAL PARAMETER;The option *-d* allows for the estimation of the distance between pairs of contigs based on the reference genome(s): in this case the scaffolded contigs will be separated by a number of N characters equal to this estimate.The estimated distances are also saved in the _distanceTable file.By default the scaffolded contigs are separated by 100 Ns")
 				.create("d");
 		opts.addOption(distances);
 
@@ -116,13 +116,13 @@ public class Scaffolder {
 				.hasArgs(1)
 				.withValueSeparator()
 				.withDescription(
-						"OPTIONAL PARAMETER; This (integer) value indicates how many randomly sampled solutions the tool evauate in order to minimize the number of scaffolds. Suggested value=5.")
+						"OPTIONAL PARAMETER;The option *-random* is available (not required). This option allows the user to run a given number of cleaning rounds and keep the best solution. Since the variability is small In practice 5 rounds are usually sufficient to find the best score.")
 				.create("random");
 		opts.addOption(random);
 
 		Option n50 = OptionBuilder.withArgName("<fastaFile>").hasArgs(1)
 				.withValueSeparator()
-				.withDescription("OPTIONAL PARAMETER; N50 statistics.")
+				.withDescription("OPTIONAL PARAMETER; The option *-n50* allows the calculation of the N50 statistic on a FASTA file. In this case the usage is the following: java -jar medusa.jar -n50 <name_of_the_fasta>. All the other options have to be omitted")
 				.create("n50");
 		opts.addOption(n50);
 
@@ -133,12 +133,10 @@ public class Scaffolder {
 			if (cl.hasOption("h")
 					|| (!cl.hasOption("i") && !cl.hasOption("n50"))) {
 				printHelp(opts);
-			} else if (cl.hasOption("i")) {
-				scaffolder(cl);
-			}
-
-			else if (cl.hasOption("n50")) {
+			}else if (cl.hasOption("n50")) {
 				n50avaluation(cl);
+			}else if (cl.hasOption("i")) {
+				scaffolder(cl);
 			}
 		} catch (UnrecognizedOptionException uoe) {
 			printHelp(opts);
