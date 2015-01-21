@@ -8,31 +8,31 @@ Availability and dependencies
 -----------------------------
 
 The present document provides a short guide for using the stand-alone
-version of the software Medusa. This software is not yet been published.
-The web interface, a stand-alone version and the present manual are
-available at <http://combo.dbe.unifi.it/medusa>. The source code is
+version of the software Medusa. This software has not yet been published.
+A web interface is available at <http://combo.dbe.unifi.it/medusa>.
+The source code, precompiled version and the present manual are
 accessible at <https://github.com/combogenomics/medusa>.
 
-Before try our software assure you to have installed the following
-packages:
+Medusa depends on the following packages being installed on your system
+and available in your PATH:
 
 1.  MUMmer: this software is available at
-    <http://mummer.sourceforge.net/>. **Warning: after installation
-    remember to add MUMmer relative path to the system variable PATH!**
+    <http://mummer.sourceforge.net/>.
 
-2.  Python (from 2.6) and BioPython (from 1.61)
+2.  Python (from 2.6) and BioPython (from 1.61).
 
 3.  Java (from 1.6).
 
-Now you are ready for obtaining and use our tool. The archive Medusa.tar.gz
-contains the following files:
+The archive Medusa.tar.gz contains the following files:
 
-1.  A runnable .jar file Medusa.jar This is the program you will run.
+1.  A runnable .jar file medusa.jar This is the program you will run.
 
-2.  A sub-folder with auxiliary scripts. Leave it in the same folder of
-    the .jar
+2.  A sub-folder with python scripts needed to run the program (medusa_scripts). Leave it in the same folder of
+    the .jar file.
 
-3.  A sub-folder with a dataset you can use to test the tool.
+3.  A sub-folder with datasets (datasets) that can be used to test the tool.
+
+4.  A sub-folder with scripts useful for benchmarking the tool.
 
 Input and Output
 ----------------
@@ -40,29 +40,29 @@ Input and Output
 The following inputs are required:
 
 -   The *targetGenome* file: a draft genome in fasta format. This is the
-    genome you are interesting in scaffolding.
+    genome you are interested in scaffolding.
 
 -   An arbitrary long list of *auxiliaryDraft* files: other draft
     genomes in fasta format. The closest these organisms are related to
     the target, the better the results will be. This files are expected
     to be collected in a specific directory. It is possible to specify
-    the path to the directory, see the command “-f” in the next section.
+    the path to the directory, see the command "-f" in the next section.
 
 The following output files will be produced.
 
--   targetGenome: a textual file containing information about
+-   targetGenome_SUMMARY: a textual file containing information about
     your data. Number of scaffolds, N50 value etc..
 
--   targetGenome.Scaffold.fasta: a fasta file with the sequences grouped
-    in scaffolds. Between two contigs in the same scaffolds 100 N are
-    inserted to fill the gap.
+-   targetGenomeScaffold.fasta: a fasta file with the sequences grouped
+    in scaffolds. Contigs in the same scaffolds are separated by 100 Ns
+    by default, or a variable number of Ns (estimate of the distance between
+    the contigs), if the option "-d" is used. 
     
 The following output files can optionally be produced.
 
 -   targetGenome_distanceTable: a tabular file with the estimation of the
 	distance between successive contigs (bp).
 	
-
 -   targetGenome_network.gexf: the contig network in gexf format.
 
 -   targetGenome_cover.gexf: the final path cover in gexf format.
@@ -71,18 +71,18 @@ The following output files can optionally be produced.
 Usage
 -----
 
-The project folder must contains:
+The project folder must contain:
 
 -   the *targetGenome* in fasta format.
 
 -   the medusa.jar file
 
--   the scripts sub-folder “medusa-scripts”.
+-   the scripts sub-folder “medusa_scripts”.
 
 -   the comparison genomes sub-folder “drafts”. (In alternative you can
-    specify another path for this folder.)
+    specify another path for this folder usinf the "-f" option)
 
-You can now run the java application with the following parameters:
+Medusa can be run with the following parameters:
 
 1.  The option *-i* is required and indicates the name of the target
     genome file.
@@ -99,7 +99,7 @@ You can now run the java application with the following parameters:
 
 5.  The option *-random* is available (not required). This option allows
     the user to run a given number of cleaning rounds and keep the best
-    solution. Since the variability is small In practice 5 rounds are
+    solution. Since the variability is small, 5 rounds are
     usually sufficient to find the best score.
 
 6.  The option *-w2* is optional and allows for a sequence similarity
@@ -108,7 +108,7 @@ You can now run the java application with the following parameters:
 
 7. The option *-d* allows for the estimation of the distance between pairs of contigs based on the reference genome(s):
 	in this case the scaffolded contigs will be separated by a number of N characters equal to this estimate.
-	The estimated distances are also saved in the "_distanceTable" file.
+	The estimated distances are also saved in the "*_distanceTable" file.
 	By default the scaffolded contigs are separated by 100 Ns.
 	
 8. The *-gexf* is optional. With this option the gexf format of the contig network and
@@ -116,14 +116,14 @@ You can now run the java application with the following parameters:
 
 9.  The option *-n50* allows the calculation of the N50 statistic on a FASTA file. 
 	In this case the usage is the following: java -jar medusa.jar -n50 <name_of_the_fasta>
-	All the other options have to be omitted.
+	All the other options will be ignored.
 
 10. Finally the *-h* option provides a small recap of the previous ones.
 
 The Medusa archive
 ------------------
 
-When *medusa* archive is unzipped the files are the followings:
+When *medusa* archive is unzipped the following files will be extracted:
 
 -   the medusa.jar file.
 
