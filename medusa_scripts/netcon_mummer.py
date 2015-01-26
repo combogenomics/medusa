@@ -54,6 +54,7 @@ def update_edges_(G,Edge):
 	w=G.get_edge_data(u,v,{'weight':0})['weight'] + weight
 	d=G.get_edge_data(u,v,{'distance':0})['distance'] + distance
 	o=G.get_edge_data(u,v,{'orientation':[]})['orientation']
+	s=G.get_edge_data(u,v,{'seqSim':[]})['seqSim'] + [seqSimilarity]
 	o.append(orientation)
 	G.add_edge(u,v,weight=w,distance=d,orientation=o)
 	
@@ -154,6 +155,7 @@ def initialize_graph(genome):
 	return G
 
 def adjust_orientations(G):
+	id_=0
 	for e in G.edges():
 		n1,n2=e
 		G[n1][n2]['orientation']=convert_orientations(e,G[n1][n2]['orientation'])
@@ -164,7 +166,14 @@ def adjust_orientations(G):
 		G[n1][n2]['orientation_max']='__'.join(['_'.join(i) for i in G[n1][n2]['orientation_max']])
 		l=G[n1][n2]['orientation']
 		counts={'_'.join(i):l.count(i)/float(len(l)) for i in l}
-		G[n1][n2]['orientation']='__'.join(['%s&%s' %(k,v) for k,v in counts.items()])
+		#G[n1][n2]['orientation']='__'.join(['%s&%s' %(k,v) for k,v in counts.items()])
+		G[n1][n2]['orientation']=''
+	edges=G.edges(data=1)
+	edges.sort(key = lambda x: x[2]['orientation_max'])
+	for e in edges:
+		n1,n2=e[:2]
+		G[n1][n2]['id']=id_
+		id_+=1
 		#embed()
 	
 def format_orientation_string(hit1,hit2):
@@ -212,7 +221,7 @@ if __name__ == '__main__':
 		edges=sort_(clusters)
 		for e in edges:
 			if not testing: update_edges(G,Edge(*e,wscheme=scheme))
-			else: update_edges_(G,Edge(*e,wscheme=scheme))
+			else: update_edges(G,Edge(*e,wscheme=scheme))
 	#embed()
 	print('adjusting orientations')
 	adjust_orientations(G)
