@@ -414,8 +414,7 @@ public class Scaffolder {
 				+ cover.getNodes().size() + " initial fragments.");
 		System.out.println("Total length of the jointed fragments: "
 				+ totalLength);
-		n50avaluation(scaffoldsfilename);
-		
+		double in50 = n50avaluation(scaffoldsfilename);
 
 		writerOutput.println("Number of scaffolds: " + numberOfScaffolds
 				+ " (singletons = " + finalSingletons
@@ -423,6 +422,9 @@ public class Scaffolder {
 				+ cover.getNodes().size() + " initial fragments.");
 		writerOutput.println("Total length of the jointed fragments: "
 				+ totalLength);
+		writerOutput.println("Computing N50 on " + numberOfScaffolds + " sequences.");
+		writerOutput.println("N50: " + in50);
+		writerOutput.println("----------------------");
 		writerOutput.flush();
 		System.out.println("Summary File saved: " + outputFile);
 
@@ -594,7 +596,7 @@ public class Scaffolder {
 
 	}
 	
-	private void n50avaluation(String scaffoldsfilename) throws Exception {
+	private double n50avaluation(String scaffoldsfilename) throws Exception {
 		ArrayList<Integer> lenghts = new ArrayList<Integer>();
 		LinkedHashMap<String, ProteinSequence> a = FastaReaderHelper
 				.readFastaProteinSequence(new File(scaffoldsfilename));
@@ -605,5 +607,7 @@ public class Scaffolder {
 		System.out.println("Computing N50 on " + lenghts.size()+ " sequences.");
 		System.out.println("N50: " + N50.n50(lenghts));
 		System.out.println("----------------------");
+
+		return N50.n50(lenghts);
 	}
 }
