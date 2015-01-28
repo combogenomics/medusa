@@ -30,7 +30,7 @@ import utilities.N50;
 
 public class Scaffolder {
 	public static final int VERSION_MAJOR = 1;
-	public static final int VERSION_MINOR = 2;
+	public static final int VERSION_MINOR = 3;
 
 	public static void main(String[] args) throws Exception {
 		new Scaffolder(args);
