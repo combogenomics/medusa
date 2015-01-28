@@ -105,6 +105,7 @@ def getBestHits_(file_):
 if __name__ == "__main__":
 
 	import sys,subprocess
+	sys.path.append('../medusa_scripts/')
 	usage=''' python bout2order_.py contigs Medusa_scaffold '''
 	args=sys.argv
 	try: f1,f2=args[1],args[2]
@@ -112,11 +113,12 @@ if __name__ == "__main__":
 		print( usage )
 		sys.exit()
 	# run nucmer
-	bashCommand='bash medusa_scripts/mummerRunner.sh %s %s' %(f1,f2)
+	bashCommand='bash ../medusa_scripts/mummerRunner.sh %s %s' %(f1,f2)
 	process = run_cmd(bashCommand)
 	# parse that thing
 	file_=getFileName(f1,f2)
-	best_hits=getBestHits_(file_)
+	try:best_hits=getBestHits_(file_)
+	except: embed()
 	out=open('string_scaffold','w')
 	for s in best_hits:
 		s_=''
