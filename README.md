@@ -30,7 +30,7 @@ The archive Medusa.tar.gz contains the following files:
 2.  A sub-folder with python scripts needed to run the program (medusa_scripts). Leave it in the same folder of
     the .jar file.
 
-3.  A sub-folder with datasets (datasets) that can be used to test the tool.
+3.  A sub-folder with a dataset (test) that can be used to test the tool.
 
 4.  A sub-folder with scripts useful for benchmarking the tool.
 
@@ -131,12 +131,21 @@ When *medusa* archive is unzipped the following files will be extracted:
 
 -   the utility test scripts folder "medusa_testing"
 
--   a folder “datasets”, containing five bacterial datasets.
+-   a folder “test”, containing one test bacterial datasets.
 
 Running an example
 -------------------
 
-    java -jar medusa.jar -f datasets/ECOL/reference_genomes/ -i datasets/ECOL/E.Coli_target.fna -v
+    java -jar medusa.jar -f test/reference_genomes/ -i test/Rhodobacter_target.fna -v
+
+Additional datasets for benchmarking
+------------------------------------
+
+Additional datasets can be retrieved at the medusa_datasets repository <https://github.com/combogenomics/medusa_datasets>.
+
+Just type
+
+    git clone https://github.com/combogenomics/medusa_datasets.git
 
 Compile
 -------
