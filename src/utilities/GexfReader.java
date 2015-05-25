@@ -134,9 +134,9 @@ public class GexfReader {
 				if (ea.getAttribute("for") != null
 						&& ea.getAttribute("for").equals(
 								attributeMap.get("orientation_max"))) {
-					String[] list =ea.getAttribute("value").split("__");
+					String[] list =ea.getAttribute("value").split("===");
 					if(list.length==1){
-					String[] os =ea.getAttribute("value").split("_");
+					String[] os =ea.getAttribute("value").split("==");
 					String o1 =os[0].split(":")[1];
 					String o2 =os[1].split(":")[1];
 					int[] orientations= new int[2];
@@ -149,7 +149,7 @@ public class GexfReader {
 						String candidate1 = list[0];
 						String candidate2 = list[1];
 						
-						String[] os =candidate1.split("_");
+						String[] os =candidate1.split("==");
 						String o1 =os[0].split(":")[1];
 						String o2 =os[1].split(":")[1];
 						int[] orientations= new int[2];
@@ -158,7 +158,7 @@ public class GexfReader {
 						orientations[1]=Integer.parseInt(o2);
 						or.add(orientations);
 						
-						String[] os1 =candidate2.split("_");
+						String[] os1 =candidate2.split("==");
 						String o11 =os1[0].split(":")[1];
 						String o21 =os1[1].split(":")[1];
 						int[] orientations1= new int[2];

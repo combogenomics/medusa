@@ -163,7 +163,7 @@ def adjust_orientations(G):
 					     key=lambda x:G[n1][n2]['orientation'].count(x)))
 		#embed()
 		G[n1][n2]['orientation_max']=list({tuple(i) for i in G[n1][n2]['orientation'] if G[n1][n2]['orientation'].count(i)==max_count})
-		G[n1][n2]['orientation_max']='__'.join(['_'.join(i) for i in G[n1][n2]['orientation_max']])
+		G[n1][n2]['orientation_max']='==='.join(['=='.join(i) for i in G[n1][n2]['orientation_max']])
 		l=G[n1][n2]['orientation']
 		counts={'_'.join(i):l.count(i)/float(len(l)) for i in l}
 		#G[n1][n2]['orientation']='__'.join(['%s&%s' %(k,v) for k,v in counts.items()])
