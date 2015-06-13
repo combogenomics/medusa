@@ -168,8 +168,7 @@ def adjust_orientations(G):
 		counts={'_'.join(i):l.count(i)/float(len(l)) for i in l}
 		#G[n1][n2]['orientation']='__'.join(['%s&%s' %(k,v) for k,v in counts.items()])
 		G[n1][n2]['orientation']=''
-	edges=G.edges(data=1)
-	edges.sort(key = lambda x: x[2]['orientation_max'])
+	edges=sorted(G.edges(), key=lambda x: G[x[0]][x[1]]['orientation_max'])
 	for e in edges:
 		n1,n2=e[:2]
 		G[n1][n2]['id']=id_
