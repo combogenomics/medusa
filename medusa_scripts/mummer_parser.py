@@ -70,8 +70,8 @@ def do_overlap(a,b):
 def doMapWithin(hit1,hit2):
 	'''return true if a (a1,a2) maps within b (b1,b2) or viceversa'''
 	a,b=[int(hit1.rstart),int(hit1.rend)],[int(hit2.rstart),int(hit2.rend)]
-	if ((max(a) > max(b)) and (min(a) < min(b))): print '%s maps within %s !!!' %(hit2.name, hit1.name)
-	elif ((max(b) > max(a)) and (min(b) < min(a))): print '%s maps within %s !!!' %(hit1.name, hit2.name)
+	if ((max(a) > max(b)) and (min(a) < min(b))): print('%s maps within %s !!!' %(hit2.name, hit1.name))
+	elif ((max(b) > max(a)) and (min(b) < min(a))): print('%s maps within %s !!!' %(hit1.name, hit2.name))
 	return 
 	
 
