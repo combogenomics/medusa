@@ -1,5 +1,5 @@
 import os,sys
-from IPython import embed
+#from IPython import embed
 
 #######################
 
@@ -22,8 +22,7 @@ def get_bestHits(hits,attr='covq'):
 	query_contigs=set([h.query for h in hits])
 	best_hits=[]
 	for c in query_contigs:
-		try: best_hit=max([h for h in hits if h.query == c],key=lambda x: float(x.__getattribute__(attr)))
-		except: embed()
+		best_hit=max([h for h in hits if h.query == c],key=lambda x: float(x.__getattribute__(attr)))
 		best_hits.append(best_hit)
 	return best_hits
 
