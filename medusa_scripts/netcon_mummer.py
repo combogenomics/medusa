@@ -1,3 +1,4 @@
+#from mummer_parser_ import *
 from mummer_parser import *
 import sys,os
 #from IPython import embed
@@ -27,8 +28,8 @@ if __name__=='__main__':
 	help="use a weighting scheme based on sequence similarity")
 	group2.add_option("-t", "--testing", dest="testing", action="store_true",default=False,
 	help="outputs a pkl object for testing [OLD]")
-	group2.add_option("-g", "--gap", dest="gap",default=1,
-	help="choose how to compute gap length: 1 mean, 2 median, 3 most similar")
+	group2.add_option("-d", "--distanceEstimation", dest="gap",default=0,
+	help="choose how to compute gap length: 0 fixed distance (100bp) [default], 1 mean, 2 median, 3 most similar")
 	parser.add_option_group(group2)
 	(options, args) = parser.parse_args()
 	if not options.query_genome or not options.mapping_dir or not options.out:
@@ -60,23 +61,27 @@ def update_edges_(G,Edge):
 	
 def update_edges(G,Edge):
 	u,v,distance,orientation,weight,seqSimilarity=Edge.name1,Edge.name2,Edge.distance,Edge.orientation,Edge.weight,Edge.seqSimilarity
-	w=G.get_edge_data(u,v,{'weight':0})['weight'] + weight
-	d=G.get_edge_data(u,v,{'distance':[]})['distance'] + [distance]
-	o=G.get_edge_data(u,v,{'orientation':[]})['orientation']
-	s=G.get_edge_data(u,v,{'seqSim':[]})['seqSim'] + [seqSimilarity]
-	o.append(orientation)
-	G.add_edge(u,v,weight=w,distance=d,orientation=o,seqSim=s)
+	if G.has_edge(u,v):
+		G[u][v]['weight'] += weight
+		G[u][v]['distance'] += [distance]
+		G[u][v]['orientation'] += [orientation]
+		G[u][v]['seqSim'] + [seqSimilarity]
+	else:
+		G.add_edge(u,v,weight=weight,distance=[distance],orientation=[orientation],seqSim=[seqSimilarity])
 	
-def compute_distances(G,method=1,outlier=1):
+def compute_distances(G,method=0,outlier=1):
 	""" Estimate the distance for each edge """
 	import numpy as np
+	skip=method==0
 	for u,v in G.edges():
-		distances=np.array(G[u][v]['distance'])
-		seqSims=np.array(G[u][v]['seqSim'])
-		if method==1: dist=distanceEstimation_mean(distances,outlier)
-		elif method==2: dist=distanceEstimation_median(distances,outlier)
-		elif method==3: dist=distanceEstimation_MSH(distances,seqSims,outlier)
-		else: dist=distanceEstimation_mean(distances,outlier)
+		if not skip:
+			distances=np.array(G[u][v]['distance'])
+			seqSims=np.array(G[u][v]['seqSim'])
+			if method==1: dist=distanceEstimation_mean(distances,outlier)
+			elif method==2: dist=distanceEstimation_median(distances,outlier)
+			elif method==3: dist=distanceEstimation_MSH(distances,seqSims,outlier)
+			else: dist=distanceEstimation_mean(distances,outlier)
+		else: dist=0
 		G[u][v]['distance']=dist
 		G[u][v]['seqSim']=''
 
@@ -148,7 +153,7 @@ def initialize_graph(genome):
 	import networkx as nx
 	from Bio.SeqIO import parse
 	G=nx.Graph()
-	contigs=[r for r in parse(genome,'fasta')]
+	contigs=parse(genome,'fasta')
 	for c in contigs:
 		id_,length=c.id,len(c.seq)
 		G.add_node(id_,length=length)
@@ -168,11 +173,13 @@ def adjust_orientations(G):
 		counts={'_'.join(i):l.count(i)/float(len(l)) for i in l}
 		#G[n1][n2]['orientation']='__'.join(['%s&%s' %(k,v) for k,v in counts.items()])
 		G[n1][n2]['orientation']=''
-	edges=sorted(G.edges(), key=lambda x: G[x[0]][x[1]]['orientation_max'])
-	for e in edges:
-		n1,n2=e[:2]
 		G[n1][n2]['id']=id_
 		id_+=1
+	#edges=sorted(G.edges(), key=lambda x: G[x[0]][x[1]]['orientation_max'])
+	#for e in edges:
+		#n1,n2=e[:2]
+		#G[n1][n2]['id']=id_
+		#id_+=1
 		#embed()
 	
 def format_orientation_string(hit1,hit2):
@@ -209,7 +216,31 @@ class Edge(object):
 		if wscheme==0:self.weight=1
 		else: self.weight=self.seqSimilarity
 
+#####################################
+
+def testForPrune():
+	""" function to profile the script """
+	mapping_dir='./'
+	out='prova.gexf'
+	query_genome='test/Rhodobacter_target.fna'
+	inputs=[f for f in os.listdir(mapping_dir) if f.endswith('.coords')]
+	G=initialize_graph(query_genome)
+	for coord in inputs:
+		print('using input',coord)
+		clusters=parse_mummer(mapping_dir + coord)
+		edges=sort_(clusters)
+		for e in edges:
+			if not testing: update_edges(G,Edge(*e,wscheme=scheme))
+			else: update_edges(G,Edge(*e,wscheme=scheme))
+	#embed()
+	print('adjusting orientations')
+	adjust_orientations(G)
+	compute_distances(G,method=gap)
+	if not testing: nx.write_gexf(G,out)
+	else: dump(G,open(out,'w'))
+
 ######################################
+import sys
 if __name__ == '__main__':
 
 	inputs=[f for f in os.listdir(mapping_dir) if f.endswith('.coords')]
@@ -221,6 +252,7 @@ if __name__ == '__main__':
 		for e in edges:
 			if not testing: update_edges(G,Edge(*e,wscheme=scheme))
 			else: update_edges(G,Edge(*e,wscheme=scheme))
+		#sys.exit()
 	#embed()
 	print('adjusting orientations')
 	adjust_orientations(G)

@@ -1,5 +1,5 @@
 import os,sys
-#from IPython import embed
+from IPython import embed
 
 #######################
 
@@ -13,19 +13,65 @@ if __name__=='__main__':
 #######################
 
 def parse(coords_file):
-	lines=[l.strip() for l in open(coords_file)]
-	hits=[mummer_hit(l) for l in lines[5:]]
-	return hits
-
-	query_contigs=set([h.query for h in hits])
+	forbid={0,1,2,3,4}
+	for i,l in enumerate(open(coords_file)):
+		if i in forbid: continue 
+		yield mummer_hit(l.strip())
 
 def get_bestHits(hits,attr='covq'):
 	query_contigs=set([h.query for h in hits])
 	best_hits=[]
 	for c in query_contigs:
-		best_hit=max([h for h in hits if h.query == c],key=lambda x: float(x.__getattribute__(attr)))
+		try: best_hit=max([h for h in hits if h.query == c],key=lambda x: float(x.__getattribute__(attr)))
+		except: embed()
 		best_hits.append(best_hit)
 	return best_hits
+
+#########################
+# start of experimental
+#########################
+
+def compare(x,y,attr):
+	return float(x.__getattribute__(attr)) > float(y.__getattribute__(attr))
+
+def compare2(x,y):
+	return float(x.covq)*float(x.percidy) > float(y.covq)*float(y.percidy)
+
+	
+def getBestHits(coords,attr='covq'):
+	""" experimental version of get_bestHits with better performances. 
+		Improvements:
+			- use of generators
+			- use of a dictionary for best hits:
+				. key = hit.query
+				. value = hit
+			- use of a dictionary for hit clusters:
+				. key = hit.reference
+				. value = [hit1,hit2,...,hitn]
+				. hits are added in order to compare the 
+				"""
+	best_hits={}
+	for h in parse(coords):
+		if h.query not in best_hits:
+			best_hits[h.query]=h
+			continue
+		if compare(h,best_hits[h.query],attr): best_hits[h.query]=h
+	return best_hits.values()
+
+def getBestHits2(hits):
+	""" same as previous, but with different comparison """
+	best_hits={}
+	for h in parse(coords):
+		if h.query not in best_hits:
+			best_hits[h.query]=h
+			continue
+		if compare2(h,best_hits[h.query]): best_hits[h.query]=h
+	yield best_hits.values()
+		
+#########################
+# end of experimental
+#########################
+
 
 def get_bestHits2(hits):
 	query_contigs=set([h.query for h in hits])
@@ -51,7 +97,8 @@ def write_Clusters(clusters,out):
 
 def parse_mummer(coords):
 	hits=parse(coords)
-	best_hits=get_bestHits(hits)
+	#best_hits=get_bestHits(hits)
+	best_hits=getBestHits(coords)
 	clusters=get_Clusters(best_hits)
 	return clusters
 
@@ -60,7 +107,7 @@ def parse_mummer2(coords):
 	best_hits=get_bestHits2(hits)
 	clusters=get_Clusters(best_hits)
 	return clusters
-
+	
 def do_overlap(a,b):
 	'''return true if a (a1,a2) overlap with b (b1,b2)'''
 	sol=	((max(a) > min(b)) and (max(a) < max(b))) or \
