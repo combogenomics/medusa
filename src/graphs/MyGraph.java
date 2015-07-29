@@ -679,29 +679,29 @@ public class MyGraph {
 
 	}
 
-	public void cleanOrinetation() {
+	public void cleanOrientation() {
 		ArrayList<MyEdge> toBeRemoved = new ArrayList<MyEdge>();
 		ArrayList<MyEdge> toBeAdded = new ArrayList<MyEdge>();
 		ArrayList<MyEdge> toBeSubstitute = new ArrayList<MyEdge>();
 		MyGraph copy = new MyGraph(this);
 		ArrayList<MyNode> leaves = copy.getLeaves();
 		MyNode current = leaves.remove(0);
-		while (!leaves.isEmpty()) {
-			if (current == null) {
+		while (!leaves.isEmpty()) { // itera sulle foglie...
+			if (current == null) { // il nodo foglia si chiama "current"
 				current = leaves.remove(0);
 			}
-			MyEdge e = copy.outEdges(current).get(0);
-			MyNode next = current.getAdj().get(0);
-			if (current.equals(e.getSource())) {
+			MyEdge e = copy.outEdges(current).get(0); // prendi l'arco corrispondente della foglia
+			MyNode next = current.getAdj().get(0); // prendi il nodo accanto a current
+			if (current.equals(e.getSource())) { // se current è la source dell'arco => l'arco segue l'ordine di lettura
 				
-				int o0 = e.orientations.get(0)[0];
-				int o1 = e.orientations.get(0)[1];
+				int o0 = e.orientations.get(0)[0]; // o0 è l'orientamento del primo nodo (source)
+				int o1 = e.orientations.get(0)[1]; // o1 è l'orientamento del secondo nodo
 				
-				if (o0 == current.getOrientation()
+				if (o0 == current.getOrientation() // se o0 == orientamento di current, setta l'orientamento di current e next come o0 e o1, rispettivamente
 						|| current.getOrientation() == 100) {
 					current.setOrientation(o0);
 					next.setOrientation(o1);
-				} else if(e.orientations.size()>1){
+				} else if(e.orientations.size()>1){ // altrimenti, se ci sono molteplici orientamenti possibili, mettili dentro o20 e 021 e fai come sopra
 					int o20 = e.orientations.get(1)[0];
 					int o21 = e.orientations.get(1)[1];
 					if (o20 == current.getOrientation()
@@ -712,23 +712,23 @@ public class MyGraph {
 					MyEdge eg = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
 					toBeRemoved.add(eg);
 				}
-				} else  {
+				} else  { // altrimenti, rimuovi l'arco dallo ST futuro (non è coerente con gli orientamenti precedenti)
 					MyEdge eg = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
 					toBeRemoved.add(eg);
 				}
 					
 					
 					
-			} else {
+			} else { // se il current non è la source dell'arco (l'arco NON segue l'ordine di lettura)
 				
-				int o0 = e.orientations.get(0)[1] * (-1);
-				int o1 = e.orientations.get(0)[0] * (-1);
-				int[] convertedOrientations = new int[2];
+				int o0 = e.orientations.get(0)[1] * (-1); // ricavati gli orientamenti secondo l'ordine di lettura, prendendo il secondo per il primo e moltiplicandolo per meno uno
+				int o1 = e.orientations.get(0)[0] * (-1); // idem, prendendo il primo per il secondo
+				int[] convertedOrientations = new int[2]; // storali in convertedOrientations
 				convertedOrientations[0]=o0;
 				convertedOrientations[1]=o1;
 			
 				
-				if (o0 == current.getOrientation()
+				if (o0 == current.getOrientation() // se o0 == orientamento di current, setta l'orientamento di current e next come o0 e o1, rispettivamente; Crea un nuovo arco da sostituire con quello attuale (vengono storati entrambi in toBeAdded e toBeSubstitute, rispettivamente)
 						|| current.getOrientation() == 100) {
 					current.setOrientation(o0);
 					next.setOrientation(o1);
@@ -736,9 +736,10 @@ public class MyGraph {
 					ArrayList<int[]> or = new ArrayList<int[]>();
 					or.add(convertedOrientations);
 					newEdge.setOrientations(or);
-					toBeAdded.add(newEdge);					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
+					toBeAdded.add(newEdge);
+					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
 					toBeSubstitute.add(truedge);
-				} else if(e.orientations.size()>1){
+				} else if(e.orientations.size()>1){ // altrimenti, se ci sono molteplici orientamenti possibili, mettili dentro o01 e o11, e fai come sopra
 					int o01 = e.orientations.get(1)[1] * (-1);
 					int o11 = e.orientations.get(1)[0] * (-1);
 					int[] convertedOrientations1 = new int[2];
@@ -756,18 +757,18 @@ public class MyGraph {
 						MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
 						toBeSubstitute.add(truedge);
 					}
-				else{
+				else{ // altrimenti, l'arco è da rimuovere (non è coerente con gli orientamenti precedenti)
 					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
 				toBeRemoved.add(truedge);
 				}
 					
-				}else{
+				}else{ // else duplicato (non lo fa mai? da rimuovere?)
 					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
 				toBeRemoved.add(truedge);
 				}
 
 			}
-			current = next;
+			current = next; // l'iterazione è conclusa e si prepara la successiva: current diventa next, e l'arco corrente viene rimosso; se il degree di current è 0, rimuovilo dalle leaves 
 			copy.removeEdge(e);
 			if (current.getDegree() == 0) {
 				leaves.remove(current);
@@ -775,7 +776,7 @@ public class MyGraph {
 			}
 
 		}
-		for (MyEdge e : toBeAdded) {
+		for (MyEdge e : toBeAdded) { // aggiungi gli archi da aggiungere e leva quelli da sostituire e rimuovere
 			addEdge(e);
 		}
 		for (MyEdge e : toBeSubstitute) {
@@ -784,7 +785,7 @@ public class MyGraph {
 		for (MyEdge e : toBeRemoved) {
 			removeEdge(e);			
 		}
-		for (MyNode n : copy.nodes) {
+		for (MyNode n : copy.nodes) { // setta l'orientamento dei nodi (l'if con 100 è una cosa di debug?)
 			MyNode node = this.nodeFromId(n.getId());
 			if(n.getOrientation()!=100){
 			node.setOrientation(n.getOrientation());
