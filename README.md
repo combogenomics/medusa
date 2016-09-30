@@ -44,7 +44,7 @@ The following inputs are required:
 
 -   An arbitrary long list of *auxiliaryDraft* files: other draft
     genomes in fasta format. The closest these organisms are related to
-    the target, the better the results will be. This files are expected
+    the target, the better the results will be. These files are expected
     to be collected in a specific directory. It is possible to specify
     the path to the directory, see the command "-f" in the next section.
 
