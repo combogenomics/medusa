@@ -85,6 +85,7 @@ public class Scaffolder {
 						"RECOMMENDED PARAMETER; The option *-v* (recommended) print on console the information given by the package MUMmer. This option is strongly suggested to understand if MUMmer is not running properly.")
 				.create("v");
 		opts.addOption(verbose);
+
 		Option weightScheme2 = OptionBuilder
 				.withValueSeparator()
 				.withDescription(
@@ -98,6 +99,15 @@ public class Scaffolder {
 						"OPTIONAL PARAMETER;Conting network and path cover are given in gexf format.")
 				.create("gexf");
 		opts.addOption(gexf);
+
+                Option threads = OptionBuilder
+                                .withArgName("<numberOfThreads>")
+                                .hasArgs(1)
+                                .withValueSeparator()
+                                .withDescription(
+                                                "OPTIONAL PARAMETER; The option *-threads* indicates the number of threads to be used with mummer (requires version >= 4.0)")
+                                .create("threads");
+                opts.addOption(threads);
 
 		Option help = OptionBuilder.withValueSeparator()
 				.withDescription("Print this help and exist.").create("h");
@@ -188,7 +198,10 @@ public class Scaffolder {
 		if(cl.hasOption("d")){
 			distanceEstimation = true;
 		}
-	
+		String threads = "";
+                if (cl.getOptionValue("threads") != null) {
+                        threads = cl.getOptionValue("threads");
+                }
 		
 		/*
 		 * ####################################################################### 
@@ -202,7 +215,7 @@ public class Scaffolder {
 		String line;
 		System.out.print("Running MUMmer...");
 		Process process = new ProcessBuilder(medusaScripts + "/mmrBatch.sh",
-				draftsFolder, input, medusaScripts).start();
+				draftsFolder, input, medusaScripts,threads).start();
 		BufferedReader errors = new BufferedReader(new InputStreamReader(
 				process.getErrorStream()));
 		if (cl.hasOption("v")) {
