@@ -28,12 +28,15 @@ def run_cmd(cmd, ignore_error=False, verbose=False):
 
 # seqIO parsing
 
-def renameSeqFile(inp,new_name='renamed.fasta',tag='seq',threshold=1000,conv_table=None,loc='./'):
+# def filterSeqGenerator(inp,threshold=)
+
+def renameSeqFile(inp,new_name=None,tag='seq',threshold=1000,conv_table=None,loc='./'):
     """ Rename a target fasta file and its sequences. Produces a new file
      and (optionally) a conversion table. By default sequences shorter
      than 1000 are removed (see threshold option) """
     # TODO: can use genbank to produce input files, right?
     from Bio.SeqIO import parse,write
+    if new_name == None: new_name = inp + "_renamed.fasta"
     sequences=[f for f in parse(inp,'fasta')]
     i,renamed=0,[]
     if conv_table != None: ctable=open(loc + conv_table,'w')
@@ -45,7 +48,7 @@ def renameSeqFile(inp,new_name='renamed.fasta',tag='seq',threshold=1000,conv_tab
         renamed.append(s)
         if conv_table != None: ctable.write('%s\t%s\n' %(old_id,new_id))
     write(renamed,loc+new_name,'fasta')
-    return
+    return 
 
 def convertWithCtable(file_,ctable,out):
     """ Convert the names of a fasta using a conversion table"""
@@ -58,35 +61,33 @@ def convertWithCtable(file_,ctable,out):
 
 # mummer
 
-def runMummer(file1,file2):
+def runMummer(file1,file2,threads=None):
+    import os
     """ Run nucmer aligner (required mummer to be installed) """
-    fname1,fname2=file1.split('/')[-1],file2.split('/')[-1]
-    tag1,tag2=fname1.split('.')[1],fname2.split('.')[1]
-    prefix="%s_%s" %(tag1,tag2)
-    cmd='nucmer --prefix=%s %s %s' %(prefix,file1,file2)
-    ecode=run_cmd(cmd)
+    fname1,fname2 = map(os.path.basename,[file1,file2])
+    tag1,tag2 = map(lambda x:x.split('.')[0], [fname1,fname2])
+    prefix = "%s_%s" %(tag1,tag2)
+    if threads != None: threads = '--threads=%s' %threads
+    else: threads = ''
+    cmd = 'nucmer --coords --prefix=%s %s %s %s' %(prefix,threads,file1,file2)
+    ecode = run_cmd(cmd)
     if ecode == False: return False,'nucmer failed!'
-    cmd2='show-coords -rcl %s.delta > %s.coords' %prefix
-    ecode=run_cmd(cmd2)
-    if ecode == False: return False,'show-coords failed!'
     return True,'no errors'
 
 class Mummer_hit(object):
     #
     def __init__(self,line):
         self.qstart,self.qend,self.rstart,self.rend,self.len1,self.len2,self.percidy,\
-        self.lenr,self.lenq,self.covq,self.covr,self.query,self.reference=[i for l in line.split(' | ') for i in l.split()]
-        self.name=self.query
-        if int(self.rstart)>int(self.rend): self.orientation=-1
-        else: self.orientation=1
+        self.lenr,self.lenq,self.covq,self.covr,self.query,self.reference = [i for l in line.split(' | ') for i in l.split()]
+        self.name = self.query
+        if int(self.rstart)>int(self.rend): self.orientation = -1
+        else: self.orientation = 1
     #
     def distance_from(self,hit):
-        a1,a2,b1,b2=int(self.rstart),int(self.rend),int(hit.rstart),int(hit.rend)
+        a1,a2,b1,b2 = map(int,[self.rstart,self.rend,hit.rstart,hit.rend])
         if do_overlap([a1,a2],[b1,b2]): return 0
         distance=abs(min(a1-b1,a1-b2,a2-b1,a2-b2))
-    return distance
-
-
+        return distance
 
 # tmp files
 

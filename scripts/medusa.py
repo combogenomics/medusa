@@ -14,6 +14,8 @@ from graph_lib import *
 import logging,sys,os
 from optparse import OptionParser,OptionGroup
 
+from IPython import embed
+
 ##########
 # Logger #
 ##########
@@ -45,6 +47,13 @@ group2.add_option("-v", "--verbose", dest="verbosity", action="store_true",defau
                   help="print to STDOUT the information given by MUMmer")
 group2.add_option("-r", "--random", dest="random", action="store_true",default=False,
                   help="allow for random choice when best edges have the same score")
+group2.add_option("--cutShortContigs", dest="cutShortContigs",default=1000,
+                  help="""drop contigs shorter than THRESHOLD writing a temporary fasta.
+                  Setting this option at 0 will disable this feature.
+						  """)
+group2.add_option("--tmpDirectory", dest="tmpDirectory", default="tmp",
+                  help="set a temporary directory ")
+
 parser.add_option_group(group2)
 
 (options, args) = parser.parse_args()
@@ -55,39 +64,40 @@ if not options.target or not options.comparison_dir:
     parser.error('Mandatory Arguments missing')
 
 
+
+
 ########
 # Main #
 ########
 
-target_,comparison_dir_=options.target,options.comparison_dir
+target,comparison_dir,output,verbosity,random,cutShortContigs,tmpDirectory = \
+options.target,options.comparison_dir,options.output,options.verbosity,options.random,options.cutShortContigs,options.tmpDirectory
+
+comparisons = [os.path.join(comparison_dir,i) for i in os.listdir(comparison_dir)]
 
 ## rename/filer the genomes
 
 # go target
-target=target_+'_renamed.fasta'
-storeTmpFasta('tmp/',target_,
-                    new_name=target,tag='target_contig',threshold=1000,conv_table=target_+'.ctable')
+#target = storeTmpFasta(tmpDirectory,target_,tag='target_contig',threshold=1000,conv_table=target_+'.ctable')
 
 # go comparison genomes
-n,genome_ctable=0,open('tmp/genomes_ctable')
-for g in os.listdir(comparison_dir_):
-    file_=comparison_dir_ + g
-    n+=1
-    storeTmpFasta('tmp/',file_,
-                    new_name='comparison_%s.fasta' %n,tag='comparison_%s_contig' %n,threshold=1000,conv_table=file_+'.ctable')
-    genome_ctable.write('%s\t%s\n' %(g,'comparison_%s.fasta' %n))
-genome_ctable.close()
+#n,genome_ctable=0,open('tmp/genomes_ctable')
+#for g in os.listdir(comparison_dir_):
+#    file_=comparison_dir_ + g
+#    n+=1
+#    storeTmpFasta('tmp/',file_,
+#                    new_name='comparison_%s.fasta' %n,tag='comparison_%s_contig' %n,threshold=1000,conv_table=file_+'.ctable')
+#    genome_ctable.write('%s\t%s\n' %(g,'comparison_%s.fasta' %n))
+#genome_ctable.close()
 
 ## do MUMmer for each pair
 
-os.chdir('tmp/')
-comparisons=[f for f in os.listdir('./') if f.startswith('comparison')]
 for c in comparisons: runMummer(target,c)
 
 ## from MUMmer to network
 
-coords=[f for f in os.listdir('./') if f.endswith('.coords')]
-Scaffolding_graph=initialize_graph(target)
+coords = [f for f in os.listdir('./') if f.endswith('.coords')]
+Scaffolding_graph = initialize_graph(target)
 coords2graph(coords,Scaffolding_graph)
 
 # from network 2 scaffold
