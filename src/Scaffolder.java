@@ -245,7 +245,7 @@ public class Scaffolder {
 		String current = new java.io.File(".").getCanonicalPath();
 
 		if (cl.hasOption("w2")) {// this weight takes in account the quality of the hits.
-			process = new ProcessBuilder("python", medusaScripts
+			process = new ProcessBuilder("python3", medusaScripts
 					+ "/netcon_mummer.py", "-f" + current, "-i" + input,
 					"-onetwork", "-w").start();
 			errors = new BufferedReader(new InputStreamReader(
@@ -258,7 +258,7 @@ public class Scaffolder {
 						"Error: Network construction failed.");
 			}
 		} else {// default weight scheme
-			process = new ProcessBuilder("python", medusaScripts
+			process = new ProcessBuilder("python3", medusaScripts
 					+ "/netcon_mummer.py", "-f" + current, "-i" + input,
 					"-onetwork").start();
 			errors = new BufferedReader(new InputStreamReader(
