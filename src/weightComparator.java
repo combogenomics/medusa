@@ -1,6 +1,7 @@
-import graphs.MyEdge;
 
+import graphs.MyEdge;
 import java.util.Comparator;
+
 public class weightComparator implements Comparator<MyEdge> {
 	@Override
 	public int compare(MyEdge o1, MyEdge o2) {

@@ -31,7 +31,7 @@ public class MyNode {
 	}
 
 	public MyNode(String id, String label) {
-		this.adj = new ArrayList<MyNode>();
+		this.adj = new ArrayList<>();
 		this.id = id;
 		this.label = label;
 		this.contiglength = 1;
@@ -39,7 +39,7 @@ public class MyNode {
 	}
 
 	public MyNode(MyNode n) {
-		this.adj = new ArrayList<MyNode>();
+		this.adj = new ArrayList<>();
 		this.id = n.getId();
 		this.label = n.getLabel();
 		this.contiglength = n.getContiglength();
@@ -74,6 +74,7 @@ public class MyNode {
 		return this.label + "[" + this.adj.size() + "]";
 	}
 
+        @Override
 	public String toString() {
 		return this.id;
 	}
@@ -98,7 +99,7 @@ public class MyNode {
 	public void addAdjacentNode(MyNode adNode) {
 		boolean r = false;
 		for (MyNode n : this.adj) {
-			if (adNode.getId() == n.getId()) {
+			if (adNode.getId() == null ? n.getId() == null : adNode.getId().equals( n.getId() )) {
 				r = true;
 			}
 		}
@@ -116,6 +117,6 @@ public class MyNode {
 		this.orientation = orientation;
 	}
 
-	
+
 
 }

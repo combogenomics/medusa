@@ -2,6 +2,7 @@ package graphs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class UnionFind {
 
@@ -12,17 +13,14 @@ public class UnionFind {
 	}
 
 	public UnionFind(ArrayList<MyNode> nodes) {
-		structure = new HashMap<String, Integer>();
+		structure = new HashMap<>();
 		for (int i = 0; i < nodes.size(); i++) {
 			structure.put(nodes.get(i).getId(), i);
 		}
 	}
 
 	public boolean find(String Id1, String Id2) {
-		if (structure.get(Id1) == structure.get(Id2)) {
-			return true;
-		} else
-			return false;
+            return Objects.equals( structure.get(Id1), structure.get(Id2) );
 
 	}
 
@@ -36,7 +34,7 @@ public class UnionFind {
 	}
 
 	private ArrayList<String> getComponent(int i) {
-		ArrayList<String> component = new ArrayList<String>();
+		ArrayList<String> component = new ArrayList<>();
 		for (String id : structure.keySet()) {
 			if (structure.get(id) == i) {
 				component.add(id);

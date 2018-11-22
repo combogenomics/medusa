@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="Medusa">
-    <property name="target" value="1.6"/>
-    <property name="source" value="1.6"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
     <path id="libs">
         <pathelement location="lib/biojava3-core-3.0.8.jar"/>
         <pathelement location="lib/commons-cli-1.2.jar"/>

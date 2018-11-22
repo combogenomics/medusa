@@ -17,11 +17,11 @@ public class MyEdge  {
 		this.source = source;
 		this.target = target;
 		int[] first;
-		
+
 		first =new int[2];
 		first[0]=1;
 		first[1]=1;
-		this.orientations= new ArrayList<int[]>();
+		this.orientations= new ArrayList<>();
 		this.orientations.add(first);
 	}
 
@@ -39,6 +39,7 @@ public class MyEdge  {
 		return s;
 	}
 
+        @Override
 	public String toString() {
 		return id;
 	}
@@ -121,7 +122,7 @@ public class MyEdge  {
 		String targetId = this.getTarget().getId();
 		String oS=  String.valueOf(orientations.get(0)[0]);
 		String oT=  String.valueOf(orientations.get(0)[1]);
-		s= sourceId+":"+oS+"_"+targetId+":"+oT;	
+		s= sourceId+":"+oS+"_"+targetId+":"+oT;
 		} else{
 			String sourceId = this.getSource().getId();
 			String targetId = this.getTarget().getId();
@@ -132,10 +133,10 @@ public class MyEdge  {
 			String targetId1 = this.getTarget().getId();
 			String oS1=  String.valueOf(orientations.get(1)[0]);
 			String oT1=  String.valueOf(orientations.get(1)[1]);
-			String s2= sourceId1+":"+oS1+"_"+targetId1+":"+oT1;	
+			String s2= sourceId1+":"+oS1+"_"+targetId1+":"+oT1;
 			s= s1+"__"+s2;
 		}
-		
+
 		return s;
 	}
 }
