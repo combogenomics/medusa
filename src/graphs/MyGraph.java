@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -63,7 +62,7 @@ public class MyGraph {
 	public double cost() {
 		double c = 0;
 		for (MyEdge e : this.getEdges()) {
-			c = c + e.getWeight();
+			c += e.getWeight();
 
 		}
 		return c;
@@ -118,7 +117,7 @@ public class MyGraph {
 		adjT.remove(e.getSource());
 		e.getTarget().setAdj(adjT);
 		this.edges.remove(e);
-		
+
 	}
 
 	public void removeNode(MyNode n) {
@@ -134,7 +133,7 @@ public class MyGraph {
 	public int sumDegree() {
 		int i = 0;
 		for (MyNode n : nodes) {
-			i = i + n.getDegree();
+			i += n.getDegree();
 		}
 		return i;
 
@@ -155,12 +154,12 @@ public class MyGraph {
 
 	public String toStringVerbose() {
 		StringBuilder br = new StringBuilder();
-		br.append("Nodes(" + nodes.size() + ")=[");
+		br.append( "Nodes(" ).append( nodes.size() ).append(")=[");
 		for (MyNode n : nodes) {
 			br.append(n.toStringVErbose());
 			br.append(", ");
 		}
-		br.append("]\n" + "Edges(" + edges.size() + ")=[");
+		br.append( "]\nEdges(" ).append( edges.size() ).append(")=[");
 		for (MyEdge e : edges) {
 			br.append(e.toStringVerbose());
 			br.append(", ");
@@ -169,6 +168,7 @@ public class MyGraph {
 		return br.toString();
 	}
 
+        @Override
 	public String toString() {
 		String s = "Nodes(" + nodes.size() + ")"
 				+ "Edges(" + edges.size() + ")=" + edges.toString();
@@ -178,13 +178,11 @@ public class MyGraph {
 
 	public double meanDegree() {
 		int sum = 0;
-		double mean = 0;
 		for (MyNode n : nodes) {
-			sum = sum + n.getDegree();
+                    sum += n.getDegree();
 		}
-		mean = sum / nodes.size();
 
-		return mean;
+		return sum / nodes.size();
 
 	}
 
@@ -202,7 +200,7 @@ public class MyGraph {
 
 	public ArrayList<String> subPaths() {
 		MyGraph copy = new MyGraph(this);
-		ArrayList<String> subPaths = new ArrayList<String>();
+		ArrayList<String> subPaths = new ArrayList<>();
 		HashMap<MyNode, Integer> originalDegrees = new HashMap<MyNode, Integer>();
 		for (MyNode n : copy.nodes) {
 			originalDegrees.put(n, n.getDegree());
@@ -289,7 +287,7 @@ public class MyGraph {
 			}
 		}
 		if (next.getDegree() == 1) {
-			
+
 			return null;
 		} else {
 						return min;
@@ -302,14 +300,14 @@ public class MyGraph {
 		StringBuilder sb = new StringBuilder();
 		int length = 0;
 		sb.append(root.getLabel() + "-");
-		length = length + root.getContiglength();
+		length += root.getContiglength();
 		MyNode current = root.getAdj().get(0);
 		MyEdge start = this.getEdgeByST(root, current);
 		this.removeEdge(start);
 		this.removeNode(root);
 		while (originalDegrees.get(current) == 2) {
 			sb.append(current.getLabel() + "-");
-			length = length + current.getContiglength();
+			length += current.getContiglength();
 			MyNode next = current.getAdj().get(0);
 			MyEdge e = this.getEdgeByST(current, next);
 			this.removeEdge(e);
@@ -317,8 +315,8 @@ public class MyGraph {
 			current = next;
 		}
 		sb.append(current.getLabel());// l'ultimo lo lascia
-		length = length + current.getContiglength();
-		sb.append("-@" + length);
+		length += current.getContiglength();
+		sb.append( "-@" ).append(length);
 		String p = sb.toString();
 		return p;
 	}
@@ -327,7 +325,7 @@ public class MyGraph {
 		int n = 0;
 		for (MyNode v : nodes) {
 			if (v.getDegree() != 0) {
-				n = n + 1;
+				n += 1;
 			}
 		}
 
@@ -459,7 +457,7 @@ public class MyGraph {
 		}
 		ArrayList<MyEdge> cuts;
 		if (next.getDegree() == 1) {
-			
+
 			cuts = null;
 		} else {
 			cuts = new ArrayList<MyEdge>();
@@ -607,7 +605,7 @@ public class MyGraph {
 		}
 		return outEdges;
 	}
-	
+
 	public ArrayList<MyEdge> inoutEdges(MyNode n) {
 		ArrayList<MyEdge> inoutEdges = new ArrayList<MyEdge>();
 		for (MyNode a : this.getNodes()) {
@@ -645,7 +643,7 @@ public class MyGraph {
 
 	private HashMap<String, String> parseSequences(String input)
 			throws IOException {
-		HashMap<String, String> sequences = new HashMap<String, String>();
+		HashMap<String, String> sequences = new HashMap<>();
 		File f = new File(input);
 		FileReader fr = new FileReader(f);
 		BufferedReader br = new BufferedReader(fr);
@@ -693,10 +691,10 @@ public class MyGraph {
 			MyEdge e = copy.outEdges(current).get(0);
 			MyNode next = current.getAdj().get(0);
 			if (current.equals(e.getSource())) {
-				
+
 				int o0 = e.orientations.get(0)[0];
 				int o1 = e.orientations.get(0)[1];
-				
+
 				if (o0 == current.getOrientation()
 						|| current.getOrientation() == 100) {
 					current.setOrientation(o0);
@@ -716,24 +714,24 @@ public class MyGraph {
 					MyEdge eg = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
 					toBeRemoved.add(eg);
 				}
-					
-					
-					
+
+
+
 			} else {
-				
+
 				int o0 = e.orientations.get(0)[1] * (-1);
 				int o1 = e.orientations.get(0)[0] * (-1);
 				int[] convertedOrientations = new int[2];
 				convertedOrientations[0]=o0;
 				convertedOrientations[1]=o1;
-			
-				
+
+
 				if (o0 == current.getOrientation()
 						|| current.getOrientation() == 100) {
 					current.setOrientation(o0);
 					next.setOrientation(o1);
 					MyEdge newEdge = new MyEdge(current.getId()+"-"+next.getId(),this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
-					ArrayList<int[]> or = new ArrayList<int[]>();
+					ArrayList<int[]> or = new ArrayList<>();
 					or.add(convertedOrientations);
 					newEdge.setOrientations(or);
 					toBeAdded.add(newEdge);					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
@@ -749,7 +747,7 @@ public class MyGraph {
 						current.setOrientation(o01);
 						next.setOrientation(o11);
 						MyEdge newEdge = new MyEdge(current.getId()+"-"+next.getId(),this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
-						ArrayList<int[]> or = new ArrayList<int[]>();
+						ArrayList<int[]> or = new ArrayList<>();
 						or.add(convertedOrientations1);
 						newEdge.setOrientations(or);
 						toBeAdded.add(newEdge);
@@ -760,7 +758,7 @@ public class MyGraph {
 					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
 				toBeRemoved.add(truedge);
 				}
-					
+
 				}else{
 					MyEdge truedge = this.getEdgeByST(this.nodeFromId(current.getId()),this.nodeFromId(next.getId()));
 				toBeRemoved.add(truedge);
@@ -779,27 +777,27 @@ public class MyGraph {
 			addEdge(e);
 		}
 		for (MyEdge e : toBeSubstitute) {
-			removeEdge(e);			
+			removeEdge(e);
 		}
 		for (MyEdge e : toBeRemoved) {
-			removeEdge(e);			
+			removeEdge(e);
 		}
 		for (MyNode n : copy.nodes) {
 			MyNode node = this.nodeFromId(n.getId());
 			if(n.getOrientation()!=100){
 			node.setOrientation(n.getOrientation());
 			}else{
-				node.setOrientation(1);	
+				node.setOrientation(1);
 			}
-			
+
 		}
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
 	}
 	public static MyGraph readGraphFromInfoFile( String infoFileName) throws IOException{
 		MyGraph g = new MyGraph();
@@ -815,7 +813,7 @@ public class MyGraph {
 		String next = reader.readLine();
 		while(next!=null){
 			index++;
-			String[] info2 = next.split("\t");	
+			String[] info2 = next.split("\t");
 			if(info2.length<4){
 				current=reader.readLine();
 				info1 = current.split("\t");
@@ -832,7 +830,7 @@ public class MyGraph {
 			target.setOrientation(orientation2);
 			MyEdge edge = new MyEdge(source.getId()+"-"+target.getId(), source, target);
 			int[] or = new int[2];
-			ArrayList<int[]> ors = new ArrayList<int[]>();
+			ArrayList<int[]> ors = new ArrayList<>();
 			or[0]= source.getOrientation();
 			or[1]=target.getOrientation();
 			ors.add(or);
@@ -847,8 +845,8 @@ public class MyGraph {
 	}
 
 	public ArrayList<String> readNodeOrder(String input) throws IOException {
-		Boolean distanceEstimation = true; 
-		ArrayList<String> scaffolds = new ArrayList<String>();
+		Boolean distanceEstimation = true;
+		ArrayList<String> scaffolds = new ArrayList<>();
 		MyGraph copy = new MyGraph(this);
 		HashMap<MyNode, Integer> originalDegrees = new HashMap<MyNode, Integer>();
 		// ----singletons---//
@@ -864,7 +862,7 @@ public class MyGraph {
 					root = r;
 					break;
 				}
-				}	
+				}
 			if (root == null) {
 				System.out.println("ERROR: no root ");
 				System.out.println("Leaves:"+copy.getLeaves().toString());
@@ -875,11 +873,11 @@ public class MyGraph {
 
 		return scaffolds;
 	}
-	
+
 	public ArrayList<String> readScaffoldsSeq(String input, HashMap<String, String> sequences, Boolean distanceEstimation) throws Exception {
 		HashMap<MyNode, Integer> originalDegrees = new HashMap<MyNode, Integer>();
 		MyGraph copy = new MyGraph(this);
-		ArrayList<String> scaffolds = new ArrayList<String>();
+		ArrayList<String> scaffolds = new ArrayList<>();
 		for (MyNode n : copy.nodes) {
 			originalDegrees.put(n, n.getDegree());
 		}
@@ -892,28 +890,28 @@ public class MyGraph {
 					root = r;
 					break;
 				}
-				}	
+				}
 			if (root == null) {
 				System.out.println("ERROR: no root ");
 				System.out.println("Leaves:"+copy.getLeaves().toString());
 			}
-			
+
 			String p;
 			if(distanceEstimation){
 				 p = copy.scaffoldStringSeqDistance(root, originalDegrees, sequences);
 			}else{
-				 p = copy.scaffoldStringSeq(root, originalDegrees, sequences);	
+				 p = copy.scaffoldStringSeq(root, originalDegrees, sequences);
 			}
-			
-			
+
+
 			scaffolds.add(p);
 		}
 
 		return scaffolds;
 	}
 
-	
-	
+
+
 	public void computeErrors(MyGraph reference, PrintWriter writer){
 		int misplacements=0;
 		int wrongoriented=0;
@@ -926,11 +924,11 @@ public class MyGraph {
 					if(a.getOrientation()!=e.getSource().getOrientation()||b.getOrientation()!=e.getTarget().getOrientation()){
 						wrongoriented++;
 					}
-					
+
 				} else if(a.getOrientation()!=(e.getTarget().getOrientation()*-1)||b.getOrientation()!=(e.getSource().getOrientation()*-1)){
 						wrongoriented++;
 					}
-				
+
 			}else{
 				misplacements++;
 			}
@@ -940,7 +938,7 @@ public class MyGraph {
 		System.out.println("Misplacements: "+misplacements);
 		System.out.println("Wrong oriented: "+wrongoriented);
 		System.out.println("Correct joints: "+(this.getEdges().size()-misplacements-wrongoriented)+" ("+((Double.valueOf(this.getEdges().size()-misplacements-wrongoriented))/(this.edges.size())*100)+")");
-	
+
 		writer.println("Total number of joints: "+this.getEdges().size());
 		writer.println("Misplacements: "+misplacements);
 		writer.println("Wrong oriented: "+wrongoriented);
@@ -974,14 +972,14 @@ public class MyGraph {
 		String p = sb.toString();
 		return p;
 	}
-	
+
 	private String scaffoldStringSeq(MyNode root, HashMap<MyNode, Integer> originalDegrees, HashMap<String, String> sequences) {
 		StringBuilder sb = new StringBuilder();
 		String rootSeq;
 		if(root.getOrientation()==-1){
 			rootSeq = reverseComplement(sequences.get(root.getId()));
 		} else{
-			rootSeq= sequences.get(root.getId());	
+			rootSeq= sequences.get(root.getId());
 		}
 		sb.append(rootSeq);
 		MyNode current = root.getAdj().get(0);
@@ -992,11 +990,11 @@ public class MyGraph {
 		this.removeEdge(start);
 		this.removeNode(root);
 		String currentSeq;
-		while (originalDegrees.get(current) == 2) {			
+		while (originalDegrees.get(current) == 2) {
 			if(current.getOrientation()==-1){
-				 currentSeq = reverseComplement(sequences.get(current.getId()));	
+				 currentSeq = reverseComplement(sequences.get(current.getId()));
 			} else{
-			 currentSeq = sequences.get(current.getId());	
+			 currentSeq = sequences.get(current.getId());
 			}
 			sb.append(currentSeq);
 			MyNode next = current.getAdj().get(0);
@@ -1009,53 +1007,53 @@ public class MyGraph {
 			current = next;
 		}
 		if(current.getOrientation()==-1){
-			 currentSeq = reverseComplement(sequences.get(current.getId()));	
+			 currentSeq = reverseComplement(sequences.get(current.getId()));
 		} else{
-		 currentSeq = sequences.get(current.getId());	
+		 currentSeq = sequences.get(current.getId());
 		}
 		sb.append(currentSeq);
 		String p = sb.toString();
 		return p;
 	}
 	//----------------------Gaps Lengths Estimation------------------------------------//
-	
+
 	private String scaffoldStringSeqDistance(MyNode root, HashMap<MyNode, Integer> originalDegrees, HashMap<String, String> sequences) {
 		StringBuilder sb = new StringBuilder();
 		String rootSeq;
 		if(root.getOrientation()==-1){
 			rootSeq = reverseComplement(sequences.get(root.getId()));
 		} else{
-			rootSeq= sequences.get(root.getId());	
+			rootSeq= sequences.get(root.getId());
 		}
 		sb.append(rootSeq);
 		MyNode current = root.getAdj().get(0);
 		MyEdge start = this.getEdgeByST(root, current);
 			for(int i=0; i<start.getLenght(); i++){
-			sb.append("N");	
+			sb.append("N");
 			}
 		this.removeEdge(start);
 		this.removeNode(root);
 		String currentSeq;
-		while (originalDegrees.get(current) == 2) {			
+		while (originalDegrees.get(current) == 2) {
 			if(current.getOrientation()==-1){
-				 currentSeq = reverseComplement(sequences.get(current.getId()));	
+				 currentSeq = reverseComplement(sequences.get(current.getId()));
 			} else{
-			 currentSeq = sequences.get(current.getId());	
+			 currentSeq = sequences.get(current.getId());
 			}
 			sb.append(currentSeq);
 			MyNode next = current.getAdj().get(0);
 			MyEdge e = this.getEdgeByST(current, next);
 			for(int i=0; i<e.getLenght(); i++){
-				sb.append("N");	
-				}	
+				sb.append("N");
+				}
 			this.removeEdge(e);
 			this.removeNode(current);
 			current = next;
 		}
 		if(current.getOrientation()==-1){
-			 currentSeq = reverseComplement(sequences.get(current.getId()));	
+			 currentSeq = reverseComplement(sequences.get(current.getId()));
 		} else{
-		 currentSeq = sequences.get(current.getId());	
+		 currentSeq = sequences.get(current.getId());
 		}
 		sb.append(currentSeq);
 		String p = sb.toString();

@@ -3,7 +3,6 @@ package utilities;
 import graphs.MyEdge;
 import graphs.MyGraph;
 import graphs.MyNode;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -11,11 +10,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -34,7 +31,7 @@ public class GexfReader {
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document doc = builder.parse(f);
 		MyGraph graph = new MyGraph();
-		HashMap<String, String> attributeMap = new HashMap<String, String>();
+		HashMap<String, String> attributeMap = new HashMap<>();
 		Element graphNode = (Element) doc.getElementsByTagName("graph").item(0);
 		// Legge due liste di attributi.
 		NodeList attributesEdge = ((Element) graphNode.getElementsByTagName(
@@ -46,7 +43,7 @@ public class GexfReader {
 		}
 		if(graphNode.getElementsByTagName("attributes").item(1)!=null){
 			//potrebbero non esserci archi
-			NodeList attributesNode = ((Element) graphNode.getElementsByTagName(				
+			NodeList attributesNode = ((Element) graphNode.getElementsByTagName(
 				"attributes").item(1)).getElementsByTagName("attribute");
 
 		for (int i = 0; i < attributesNode.getLength(); ++i) {
@@ -91,16 +88,16 @@ public class GexfReader {
 			String id = current.getAttribute("id");
 			String source = current.getAttribute("source");
 			String target = current.getAttribute("target");
-			String weight = current.getAttribute("weight");	
+			String weight = current.getAttribute("weight");
 			MyNode ns = graph.nodeFromId(source);
 			MyNode nt = graph.nodeFromId(target);
 			MyEdge e = new MyEdge(id, ns, nt);
-			
+
 			NodeList edgeAttributes = ((Element) current.getElementsByTagName(
 					"attvalues").item(0)).getElementsByTagName("attvalue");
 			for (int j = 0; j < edgeAttributes.getLength(); ++j) {
 				Element ea = (Element) edgeAttributes.item(j);
-				
+
 				if(weight!=null){
 					e.setWeight(Double.parseDouble(weight));//se weight e' direttamente nell'arco
 				}else if (ea.getAttribute("for") != null//altrimenti lo cerca negli attributi
@@ -113,7 +110,7 @@ public class GexfReader {
 						&& ea.getAttribute("for").equals(
 								attributeMap.get("distance"))) {
 					e.setLenght(Double.parseDouble(ea.getAttribute("value")));
-					
+
 				}
 				/*
 				if (ea.getAttribute("for") != null
@@ -128,9 +125,9 @@ public class GexfReader {
 					orientations[1]=Integer.parseInt(o2);
 					or.add(orientations);
 					e.setOrientations(or);
-					
+
 				}*/
-				
+
 				if (ea.getAttribute("for") != null
 						&& ea.getAttribute("for").equals(
 								attributeMap.get("orientation_max"))) {
@@ -140,24 +137,24 @@ public class GexfReader {
 					String o1 =os[0].split(":")[1];
 					String o2 =os[1].split(":")[1];
 					int[] orientations= new int[2];
-					ArrayList<int[]> or = new ArrayList<int[]>();
+					ArrayList<int[]> or = new ArrayList<>();
 					orientations[0]=Integer.parseInt(o1);
 					orientations[1]=Integer.parseInt(o2);
 					or.add(orientations);
-					e.setOrientations(or);	
+					e.setOrientations(or);
 					} else{
 						String candidate1 = list[0];
 						String candidate2 = list[1];
-						
+
 						String[] os =candidate1.split("==");
 						String o1 =os[0].split(":")[1];
 						String o2 =os[1].split(":")[1];
 						int[] orientations= new int[2];
-						ArrayList<int[]> or = new ArrayList<int[]>();
+						ArrayList<int[]> or = new ArrayList<>();
 						orientations[0]=Integer.parseInt(o1);
 						orientations[1]=Integer.parseInt(o2);
 						or.add(orientations);
-						
+
 						String[] os1 =candidate2.split("==");
 						String o11 =os1[0].split(":")[1];
 						String o21 =os1[1].split(":")[1];
@@ -165,12 +162,12 @@ public class GexfReader {
 						orientations1[0]=Integer.parseInt(o11);
 						orientations1[1]=Integer.parseInt(o21);
 						or.add(orientations1);
-						
+
 						e.setOrientations(or);
 					}
-					
-					
-					
+
+
+
 				}
 			}
 
@@ -178,19 +175,19 @@ public class GexfReader {
 		}
 		return graph;
 	}
-	
-	
-	
+
+
+
 
 	public static HashMap<String, String[]> readContigInfo(String fileName)
 			throws IOException {
-		HashMap<String, String[]> contigInfo = new HashMap<String, String[]>();
+		HashMap<String, String[]> contigInfo = new HashMap<>();
 		File f = new File(fileName);
 		FileReader fr = new FileReader(f);
 		BufferedReader br = new BufferedReader(fr);
 		String currentLine = br.readLine();
 		int i = 0;
-		
+
 		while (currentLine != null) {
 			String contigPosition = String.valueOf(i);
 			String[] split = currentLine.split("\t");
@@ -226,12 +223,11 @@ public class GexfReader {
 
 	public static HashMap<String, Double> readBc(String fileName)
 			throws IOException {
-		HashMap<String, Double> bcMap = new HashMap<String, Double>();
+		HashMap<String, Double> bcMap = new HashMap<>();
 		File f = new File(fileName);
 		FileReader fr = new FileReader(f);
 		BufferedReader br = new BufferedReader(fr);
 		String currentLine = br.readLine();
-
 		while (currentLine != null) {
 
 			String[] splitLine = currentLine.split("\t");
@@ -251,7 +247,7 @@ public class GexfReader {
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document doc = builder.parse(input);
 		MyGraph graph = new MyGraph();
-		HashMap<String, String> attributeMap = new HashMap<String, String>();
+		HashMap<String, String> attributeMap = new HashMap<>();
 		Element graphNode = (Element) doc.getElementsByTagName("graph").item(0);
 		// Legge l'indice degli attributi.
 		NodeList attributes = ((Element) graphNode.getElementsByTagName(
