@@ -1,10 +1,10 @@
-
 import graphs.MyEdge;
 import graphs.MyGraph;
 import graphs.MyNode;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -48,6 +48,26 @@ public class Scaffolder {
 						"REQUIRED PARAMETER;The option *-i* indicates the name of the target genome file.")
 				.create("i");
 		opts.addOption(input);
+
+
+                Option keepTmp = OptionBuilder
+                                .withArgName("<keepTemp>")
+                                .hasArgs(1)
+                                .withValueSeparator()
+                                .withDescription(
+                                                "OPTIONAL PARAMETER;The option *-t* indicate that the temporary files will not be deleted.")
+                                .create("t");
+                opts.addOption(keepTmp);
+
+
+		Option skipMap = OptionBuilder
+				.withArgName("<skipMapping>")
+				.hasArgs(1)
+				.withValueSeparator()
+				.withDescription(
+						"OPTIONAL PARAMETER;The option *-s* allows to skip mapping, indicating a path to which the mummer output are stored.")
+				.create("s");
+		opts.addOption(skipMap);
 
 		Option output = OptionBuilder
 				.withArgName("<outputName>")
@@ -199,6 +219,24 @@ public class Scaffolder {
                 if (cl.getOptionValue("threads") != null) {
                         threads = cl.getOptionValue("threads");
                 }
+		Boolean skipMapping =false;
+		if(cl.hasOption("s")){
+			skipMapping =true;
+			String mappingDir =cl.getOptionValue("s");
+			if(mappingDir==null){
+				mappingDir=".";
+			}
+		}
+		
+		boolean keepTemp = false;
+		if(cl.hasOption("t")){
+			String keepOpenToString = cl.getOptionValue("t");
+			if("true".equals(keepOpenToString)) {
+				keepTemp = Boolean.valueOf(keepOpenToString);
+			}
+		}
+		
+
 
 		/*
 		 * #######################################################################
@@ -207,32 +245,35 @@ public class Scaffolder {
 		 * #######################################################################
 		 *
 		 */
-
+		
 		System.out.println("------------------------------------------------------------------------------------------------------------------------");
 		String line;
-		System.out.print("Running MUMmer...");
-		Process process = new ProcessBuilder(medusaScripts + "/mmrBatch.sh",
-				draftsFolder, input, medusaScripts,threads).start();
-		BufferedReader errors = new BufferedReader(new InputStreamReader(
-				process.getErrorStream()));
-		if (cl.hasOption("v")) {
-			while ((line = errors.readLine()) != null) {
-				System.out.println(line);
-			}
-			if (process.waitFor() != 0) {
-				throw new RuntimeException("Error running MUMmer.");
-			}
-		} else {
-			while ((line = errors.readLine()) != null) {
-			}
-			if (process.waitFor() != 0) {
-				throw new RuntimeException("Error running MUMmer.");
+		if(!skipMapping)
+		{
+			Process process = new ProcessBuilder(medusaScripts + "/mmrBatch.sh",
+					draftsFolder, input, medusaScripts,threads).start();
+			BufferedReader errors = new BufferedReader(new InputStreamReader(
+					process.getErrorStream()));
+		
+			if (cl.hasOption("v")) {
+				while ((line = errors.readLine()) != null) {
+					System.out.println(line);
+				}
+				if (process.waitFor() != 0) {
+					throw new RuntimeException("Error running MUMmer.");
+				}
+			} else {
+				while ((line = errors.readLine()) != null) {
+				}
+				if (process.waitFor() != 0) {
+					throw new RuntimeException("Error running MUMmer.");
+				}
 			}
 		}
 
 		System.out.print("done.\n");
-
-
+		
+		
 		/*
 		 * #######################################################################
 		 * STEP2: The adjacencies collected by MUMmer are used by a python script to populate an
@@ -243,9 +284,17 @@ public class Scaffolder {
 		System.out.print("Building the network...");
 
 		String current = new java.io.File(".").getCanonicalPath();
-
+/*		if(skipMapping){
+			current = new java.io.File(mappingDir).getCanonicalPath();
+		}*/
+		
+		Process process = null;
+		BufferedReader errors = null;
+		
+		
+		
 		if (cl.hasOption("w2")) {// this weight takes in account the quality of the hits.
-			process = new ProcessBuilder("python3", medusaScripts
+			process = new ProcessBuilder("python2.7", medusaScripts
 					+ "/netcon_mummer.py", "-f" + current, "-i" + input,
 					"-onetwork", "-w").start();
 			errors = new BufferedReader(new InputStreamReader(
@@ -258,9 +307,11 @@ public class Scaffolder {
 						"Error: Network construction failed.");
 			}
 		} else {// default weight scheme
-			process = new ProcessBuilder("python3", medusaScripts
+			process = new ProcessBuilder("python2.7", medusaScripts
 					+ "/netcon_mummer.py", "-f" + current, "-i" + input,
 					"-onetwork").start();
+			System.out.println("python2.7"+medusaScripts+ "/netcon_mummer.py"+"-f" + current+  "-i" + input +
+					"-onetwork");
 			errors = new BufferedReader(new InputStreamReader(
 					process.getErrorStream()));
 			while ((line = errors.readLine()) != null) {
@@ -271,24 +322,40 @@ public class Scaffolder {
 						"Error: Network construction failed.");
 			}
 		}
-		/*
+		
+			/*
 		 * The network generated by the python script is stored in an object belonging to the class MyGraph.
 		 */
 		MyGraph graph = GexfReader.read("network");
 
 		// Remove temporary files.
-		File network = new File("network");
-		network.delete();
-		File dir = new File(".");
-		for (String address : dir.list((File dir1, String name) -> name.toLowerCase().endsWith(".coords"))) {
-			File f = new File(address);
-			f.delete();
-		}
-		for (String address : dir.list((File dir1, String name) -> name.toLowerCase().endsWith(".delta"))) {
-			File f = new File(address);
-			f.delete();
-		}
+		if(!keepTemp){
+			
+			// Remove temporary files.
+			File network = new File("network");
+			network.delete();
+			File dir = new File(".");
+			
 
+		 
+			String[] matches = dir.list(new FilenameFilter()
+			{
+			  public boolean accept(File dir, String name)
+			  {
+			     
+				  return name.toLowerCase().endsWith(".coords") || name.toLowerCase().endsWith(".delta") 
+						  || name.toLowerCase().endsWith(".mgaps") || name.toLowerCase().endsWith(".ntref");
+			  }
+			});
+			
+			
+			for (String address : matches)
+			{
+				File f = new File(address);
+				f.delete();
+			}	
+			
+		}
 		if (graph.getEdges().size() == 0) {
 			System.out
 					.println("SORRY: No information found. Are you sure to have MUMmer packedge location in your PATH? If yes, the chosen drafts genomes don't provide sufficient information for scaffolding the target genome.");
